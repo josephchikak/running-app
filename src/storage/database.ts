@@ -68,6 +68,7 @@ export interface TrainingRepository {
   getCounter: (key: string) => Promise<number>
   createBackup: (exportedAt: string) => Promise<Backup>
   replaceFromBackup: (backup: Backup) => Promise<void>
+  clearAllData: () => Promise<void>
   destroy: () => Promise<void>
 }
 
@@ -218,6 +219,23 @@ export function createTrainingRepository (databaseName = DATABASE_NAME): Trainin
       if (backup.activeSession) {
         await transaction.objectStore('activeSession').put(backup.activeSession, CURRENT_KEY)
       }
+      await transaction.done
+    },
+
+    async clearAllData () {
+      const database = await getDatabase()
+      const transaction = database.transaction(
+        ['settings', 'enrollment', 'schedule', 'activeSession', 'results', 'analytics'],
+        'readwrite'
+      )
+      await Promise.all([
+        transaction.objectStore('settings').clear(),
+        transaction.objectStore('enrollment').clear(),
+        transaction.objectStore('schedule').clear(),
+        transaction.objectStore('activeSession').clear(),
+        transaction.objectStore('results').clear(),
+        transaction.objectStore('analytics').clear()
+      ])
       await transaction.done
     },
 

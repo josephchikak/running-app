@@ -30,5 +30,11 @@ export default tseslint.config(
       'no-console': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }]
     }
+  },
+  {
+    files: ['src/app/routes.tsx', 'src/app/TrainingContext.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off'
+    }
   }
 )

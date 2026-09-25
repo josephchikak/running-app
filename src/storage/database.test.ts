@@ -56,4 +56,22 @@ describe('training repository', () => {
     await expect(repository.getCounter('workouts-started')).resolves.toBe(2)
     await expect(repository.saveResult({ ...result, coordinates: [] } as unknown as WorkoutResult)).rejects.toThrow()
   })
+
+  it('erases all local training and analytics data', async () => {
+    await repository.saveSettings(settings)
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule([scheduledWorkout])
+    await repository.saveActiveSession(activeSession)
+    await repository.saveResult(result)
+    await repository.incrementCounter('workouts-started')
+
+    await repository.clearAllData()
+
+    await expect(repository.getSettings()).resolves.toBeNull()
+    await expect(repository.getEnrollment()).resolves.toBeNull()
+    await expect(repository.listSchedule()).resolves.toEqual([])
+    await expect(repository.getActiveSession()).resolves.toBeNull()
+    await expect(repository.listResults()).resolves.toEqual([])
+    await expect(repository.getCounter('workouts-started')).resolves.toBe(0)
+  })
 })
