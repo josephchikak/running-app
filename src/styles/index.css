@@ -167,6 +167,136 @@ a:focus-visible {
   backdrop-filter: blur(18px);
 }
 
+.strength-player {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+  background: #0c2c2e;
+}
+
+.strength-player__header {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.strength-player__eyebrow,
+.strength-player__kind,
+.step-progress__label,
+.easier-option span {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.step-progress {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.step-progress__label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-progress__track {
+  height: 0.35rem;
+  overflow: hidden;
+  background: rgb(245 242 232 / 14%);
+}
+
+.step-progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--color-action);
+  transition: width 180ms ease;
+}
+
+.strength-player__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 0 2rem;
+}
+
+.strength-player h1 {
+  max-width: 12ch;
+  margin: 0.65rem 0 1rem;
+  font: 600 clamp(3.5rem, 17vw, 6rem) / 0.88 'Barlow Condensed', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.strength-player__metric {
+  margin: 0;
+  color: var(--color-action);
+  font: 600 clamp(4.5rem, 23vw, 8rem) / 0.85 'Barlow Condensed', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.strength-player__instruction {
+  max-width: 34rem;
+  margin: 1.5rem 0 0;
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+.easier-option {
+  max-width: 34rem;
+  margin-top: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-easy);
+}
+
+.easier-option p {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
+.workout-controls {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workout-controls button {
+  min-height: 3.25rem;
+  border: 1px solid rgb(245 242 232 / 28%);
+  border-radius: 0.55rem;
+  color: var(--color-text);
+  background: transparent;
+  font-weight: 750;
+}
+
+.workout-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.workout-controls .workout-controls__primary {
+  min-height: 4rem;
+  border-color: var(--color-action);
+  color: #173536;
+  background: var(--color-action);
+}
+
+.workout-controls__minor {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.strength-player--complete {
+  justify-content: center;
+}
+
+.strength-player--complete p:last-child {
+  color: var(--color-muted);
+}
+
 .nav-link {
   display: grid;
   place-items: center;
@@ -206,5 +336,6 @@ a:focus-visible {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
