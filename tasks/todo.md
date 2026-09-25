@@ -12,7 +12,7 @@
 - [x] Task 4: Pure workout engine and guided strength player
 - [x] Task 5: IndexedDB, recovery, and backup
 - [x] Task 6: Today, Plan, History, and Settings screens
-- [ ] Task 7: GPS filtering and live run metrics
+- [x] Task 7: GPS filtering and live run metrics
 - [ ] Task 8: Speech, wake lock, and active run orchestration
 - [ ] Task 9: Installability, offline operation, legal surfaces, and release verification
 
@@ -24,3 +24,4 @@
 - Task 4: Added a deterministic workout reducer for time, distance, manual repetitions, pause/resume, navigation, and finish states. The mobile strength player includes accessible controls, progress, exercise instructions, and easier variations. Lint, 29 tests, typecheck, and production build pass.
 - Task 5: Added schema-validated IndexedDB stores for settings, enrollment, schedule, active checkpoints, results, and local-only counters. Versioned backup export/import replaces data atomically only after full validation and never serializes route coordinates. Lint, 37 tests, typecheck, build, and dependency audit pass.
 - Task 6: Replaced shell placeholders with tested enrollment, setup confirmation, Today, 17-week Plan, summary-only History, and Settings flows. Settings includes baseline/cues, validated backup/restore, and confirmed local erasure. Non-critical routes are split into lazy chunks. Lint, 46 tests, typecheck, build, and a 375×812 visual check pass.
+- Task 7: Added a foreground high-accuracy GPS adapter with named accuracy, drift, speed, and staleness thresholds. Haversine distance and rolling-window pace calculations are deterministic, and stop always releases the browser watch. Lint, 54 tests, typecheck, and production build pass.
