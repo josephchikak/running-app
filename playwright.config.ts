@@ -8,9 +8,6 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     ...devices['iPhone 13'],
     browserName: 'chromium',
-    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
-      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
-      : undefined,
     serviceWorkers: 'allow',
     trace: 'retain-on-failure'
   },
