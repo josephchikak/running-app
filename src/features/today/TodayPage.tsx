@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTraining } from '../../app/TrainingContext'
+import { ScheduledWorkoutActions } from '../../components/ScheduledWorkoutActions'
 import { workoutCatalog } from '../../data/plans/catalog'
+import { getOverdueWorkouts } from '../../domain/schedule'
 
 export function TodayPage () {
-  const { enrollment, schedule, startPlan, today, isLoading, error } = useTraining()
+  const { enrollment, schedule, startPlan, skipWorkout, today, isLoading, error } = useTraining()
   const navigate = useNavigate()
   const [isStarting, setIsStarting] = useState(false)
   const todayEntry = useMemo(() => schedule.find(entry => entry.date === today), [schedule, today])
@@ -15,6 +17,7 @@ export function TodayPage () {
     ? schedule.filter(entry => entry.weekNumber === displayedEntry.weekNumber && entry.workoutId)
     : []
   const completedSessions = weeklySessions.filter(entry => entry.status === 'completed').length
+  const overdueEntries = useMemo(() => getOverdueWorkouts(schedule, today), [schedule, today])
 
   const handleStartPlan = useCallback(async () => {
     setIsStarting(true)
@@ -63,7 +66,11 @@ export function TodayPage () {
               <div><dt>Time</dt><dd>{workout.estimatedMinutes} min</dd></div>
               <div><dt>This week</dt><dd>{completedSessions}/{weeklySessions.length}</dd></div>
             </dl>
-            <button className='primary-action' onClick={handleStartWorkout} type='button'>Start workout</button>
+            {displayedEntry.status === 'scheduled' && (
+              <button className='primary-action' onClick={handleStartWorkout} type='button'>Start workout</button>
+            )}
+            {displayedEntry.status === 'completed' && <p className='session-outcome'>Completed</p>}
+            {displayedEntry.status === 'skipped' && <p className='session-outcome'>Skipped</p>}
           </>
         )}
         {!isLoading && enrollment && !workout && (
@@ -73,9 +80,40 @@ export function TodayPage () {
             <p className='session-summary'>Keep the day easy. Your next session is already waiting in the plan.</p>
           </>
         )}
+        {!isLoading && enrollment && overdueEntries.length > 0 && (
+          <section className='catch-up'>
+            <header><p className='page-kicker'>Missed sessions</p><h2>Catch up</h2></header>
+            <ol>
+              {overdueEntries.map(entry => {
+                const overdueWorkout = entry.workoutId ? workoutCatalog[entry.workoutId] : undefined
+                if (!overdueWorkout) return null
+                return (
+                  <li key={entry.id}>
+                    <div>
+                      <time dateTime={entry.date}>{formatShortDate(entry.date)}</time>
+                      <h3>{overdueWorkout.title}</h3>
+                    </div>
+                    <ScheduledWorkoutActions
+                      onSkip={() => skipWorkout(entry.id)}
+                      onStart={() => navigate(`/workout/${entry.id}`)}
+                      startAriaLabel={`Do ${overdueWorkout.title} today`}
+                      startLabel='Do today'
+                      workoutTitle={overdueWorkout.title}
+                    />
+                  </li>
+                )
+              })}
+            </ol>
+          </section>
+        )}
       </div>
     </section>
   )
+}
+
+function formatShortDate (value: string) {
+  return new Intl.DateTimeFormat('en-NG', { weekday: 'short', day: 'numeric', month: 'short' })
+    .format(new Date(`${value}T12:00:00Z`))
 }
 
 function formatDisplayDate (value: string) {

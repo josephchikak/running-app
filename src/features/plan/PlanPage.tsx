@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTraining } from '../../app/TrainingContext'
+import { ScheduledWorkoutActions } from '../../components/ScheduledWorkoutActions'
 import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
-import type { PlanWeek } from '../../domain/models'
+import type { PlanWeek, ScheduledWorkout } from '../../domain/models'
 
 const phaseLabels = {
   'faster-5k': 'Faster 5K',
@@ -10,7 +12,8 @@ const phaseLabels = {
 } as const
 
 export function PlanPage () {
-  const { enrollment, schedule } = useTraining()
+  const { enrollment, schedule, skipWorkout } = useTraining()
+  const navigate = useNavigate()
   const currentEntry = schedule.find(entry => entry.status === 'scheduled')
   const initialWeek = currentEntry?.weekNumber ?? 1
   const [expandedWeek, setExpandedWeek] = useState(initialWeek)
@@ -18,6 +21,9 @@ export function PlanPage () {
   const handleWeekClick = useCallback((weekNumber: number) => {
     setExpandedWeek(current => current === weekNumber ? 0 : weekNumber)
   }, [])
+  const handleStartWorkout = useCallback((scheduledWorkoutId: string) => {
+    navigate(`/workout/${scheduledWorkoutId}`)
+  }, [navigate])
 
   return (
     <section className='page-surface plan-page'>
@@ -35,7 +41,10 @@ export function PlanPage () {
               <PlanWeekRow
                 isExpanded={week.number === expandedWeek}
                 key={week.number}
+                onSkip={skipWorkout}
+                onStart={handleStartWorkout}
                 onToggle={handleWeekClick}
+                schedule={schedule}
                 week={week}
               />
             ))}
@@ -50,10 +59,14 @@ interface PlanWeekRowProps {
   week: PlanWeek
   isExpanded: boolean
   onToggle: (weekNumber: number) => void
+  onStart: (scheduledWorkoutId: string) => void
+  onSkip: (scheduledWorkoutId: string) => Promise<void>
+  schedule: ScheduledWorkout[]
 }
 
-function PlanWeekRow ({ week, isExpanded, onToggle }: PlanWeekRowProps) {
+function PlanWeekRow ({ week, isExpanded, onToggle, onStart, onSkip, schedule }: PlanWeekRowProps) {
   const handleToggle = useCallback(() => onToggle(week.number), [onToggle, week.number])
+  const weekSchedule = schedule.filter(entry => entry.weekNumber === week.number)
 
   return (
     <article className={isExpanded ? 'plan-week plan-week--open' : 'plan-week'}>
@@ -64,16 +77,38 @@ function PlanWeekRow ({ week, isExpanded, onToggle }: PlanWeekRowProps) {
       </button>
       {isExpanded && (
         <ol className='week-sessions'>
-          {Object.entries(week.schedule).map(([day, workoutId]) => (
-            <li key={day}>
-              <span>{capitalize(day)}</span>
-              <strong>{workoutId ? workoutCatalog[workoutId].title : 'Full rest'}</strong>
-            </li>
-          ))}
+          {Object.entries(week.schedule).map(([day, workoutId], dayIndex) => {
+            const scheduled = weekSchedule[dayIndex]
+            const workout = workoutId ? workoutCatalog[workoutId] : undefined
+            return (
+              <li key={day}>
+                <div className='week-session__summary'>
+                  <span>{capitalize(day)}{scheduled ? ` · ${formatPlanDate(scheduled.date)}` : ''}</span>
+                  <strong>{workout?.title ?? 'Full rest'}</strong>
+                </div>
+                {scheduled?.status === 'scheduled' && workout && (
+                  <ScheduledWorkoutActions
+                    onSkip={() => onSkip(scheduled.id)}
+                    onStart={() => onStart(scheduled.id)}
+                    startAriaLabel={`Start ${workout.title}`}
+                    startLabel='Start'
+                    workoutTitle={workout.title}
+                  />
+                )}
+                {scheduled?.status === 'completed' && <span className='session-status'>Completed</span>}
+                {scheduled?.status === 'skipped' && <span className='session-status'>Skipped</span>}
+              </li>
+            )
+          })}
         </ol>
       )}
     </article>
   )
+}
+
+function formatPlanDate (value: string) {
+  return new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short' })
+    .format(new Date(`${value}T12:00:00Z`))
 }
 
 function capitalize (value: string) {

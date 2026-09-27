@@ -20,7 +20,7 @@ export function HistoryPage () {
         {results.map(result => (
           <li key={result.id}>
             <div>
-              <time dateTime={result.completedAt}>{formatHistoryDate(result.completedAt)}</time>
+              <time dateTime={result.completedAt}>{formatHistoryTiming(result.plannedDate, result.completedAt)}</time>
               <h2>{workoutCatalog[result.workoutId]?.title ?? 'Workout'}</h2>
             </div>
             <dl>
@@ -43,4 +43,11 @@ function formatDuration (seconds: number) {
 
 function formatHistoryDate (value: string) {
   return new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(value))
+}
+
+function formatHistoryTiming (plannedDate: string | undefined, completedAt: string) {
+  if (!plannedDate || plannedDate === completedAt.slice(0, 10)) return formatHistoryDate(completedAt)
+
+  const format = new Intl.DateTimeFormat('en-NG', { day: 'numeric', month: 'short' })
+  return `Planned ${format.format(new Date(`${plannedDate}T12:00:00Z`))} · Completed ${format.format(new Date(completedAt))}`
 }

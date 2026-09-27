@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { trainingCatalog } from '../data/plans/catalog'
-import { expandPlanSchedule, getTodayEntry, getWeeklyProgress } from './schedule'
+import {
+  expandPlanSchedule,
+  getOverdueWorkouts,
+  getTodayEntry,
+  getWeeklyProgress,
+  updateWorkoutStatus
+} from './schedule'
 
 describe('plan scheduling', () => {
   it('places the agreed sessions from Monday through Sunday', () => {
@@ -46,5 +52,29 @@ describe('plan scheduling', () => {
 
     expect(getTodayEntry(withResults, '2026-09-30')?.kind).toBe('quality-run')
     expect(getWeeklyProgress(withResults, '2026-09-30')).toEqual({ completed: 2, total: 6 })
+  })
+
+  it('returns only unfinished workouts scheduled before today', () => {
+    const schedule = expandPlanSchedule(trainingCatalog, '2026-09-28').map(entry => {
+      if (entry.date === '2026-09-28') return { ...entry, status: 'completed' as const }
+      return entry
+    })
+
+    expect(getOverdueWorkouts(schedule, '2026-10-04').map(entry => entry.date)).toEqual([
+      '2026-09-29',
+      '2026-09-30',
+      '2026-10-01',
+      '2026-10-02',
+      '2026-10-03'
+    ])
+  })
+
+  it('changes one workout status without moving any planned dates', () => {
+    const schedule = expandPlanSchedule(trainingCatalog, '2026-09-28')
+    const updated = updateWorkoutStatus(schedule, schedule[0].id, 'skipped')
+
+    expect(updated[0]).toMatchObject({ date: '2026-09-28', status: 'skipped' })
+    expect(updated.slice(1).map(entry => entry.date)).toEqual(schedule.slice(1).map(entry => entry.date))
+    expect(() => updateWorkoutStatus(schedule, 'missing-workout', 'skipped')).toThrow(/not found/i)
   })
 })

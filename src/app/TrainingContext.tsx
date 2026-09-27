@@ -14,7 +14,7 @@ import type {
   UserSettings,
   WorkoutResult
 } from '../domain/models'
-import { expandPlanSchedule } from '../domain/schedule'
+import { expandPlanSchedule, updateWorkoutStatus } from '../domain/schedule'
 import { importBackup } from '../storage/backup'
 import { trainingRepository, type TrainingRepository } from '../storage/database'
 
@@ -36,6 +36,7 @@ interface TrainingContextValue {
   error: string | null
   startPlan: () => Promise<void>
   saveSettings: (settings: UserSettings) => Promise<void>
+  skipWorkout: (scheduledWorkoutId: string) => Promise<void>
   restoreBackup: (json: string) => Promise<void>
   eraseAllData: () => Promise<void>
   refresh: () => Promise<void>
@@ -126,6 +127,12 @@ export function TrainingProvider ({
     setSettings(nextSettings)
   }, [repository])
 
+  const skipWorkout = useCallback(async (scheduledWorkoutId: string) => {
+    const nextSchedule = updateWorkoutStatus(schedule, scheduledWorkoutId, 'skipped')
+    await repository.replaceSchedule(nextSchedule)
+    setSchedule(nextSchedule)
+  }, [repository, schedule])
+
   const restoreBackup = useCallback(async (json: string) => {
     await importBackup(repository, json)
     await reload()
@@ -150,6 +157,7 @@ export function TrainingProvider ({
     error,
     startPlan,
     saveSettings,
+    skipWorkout,
     restoreBackup,
     eraseAllData,
     refresh: reload
@@ -164,6 +172,7 @@ export function TrainingProvider ({
     error,
     startPlan,
     saveSettings,
+    skipWorkout,
     restoreBackup,
     eraseAllData,
     reload

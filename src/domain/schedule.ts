@@ -9,6 +9,13 @@ export interface ScheduleEntry {
   status: 'scheduled' | 'completed' | 'skipped'
 }
 
+interface DatedWorkout {
+  id: string
+  date: string
+  workoutId: string | null
+  status: ScheduleEntry['status']
+}
+
 const DAY_KEYS = [
   'monday',
   'tuesday',
@@ -79,6 +86,26 @@ export function expandPlanSchedule (plan: PlanTemplate, startDate: string): Sche
 export function getTodayEntry (schedule: ScheduleEntry[], date: string) {
   parseLocalDate(date)
   return schedule.find(entry => entry.date === date)
+}
+
+export function getOverdueWorkouts<T extends DatedWorkout> (schedule: readonly T[], date: string): T[] {
+  parseLocalDate(date)
+  return schedule.filter(entry => {
+    return entry.date < date && entry.workoutId !== null && entry.status === 'scheduled'
+  })
+}
+
+export function updateWorkoutStatus<T extends DatedWorkout> (
+  schedule: readonly T[],
+  scheduledWorkoutId: string,
+  status: ScheduleEntry['status']
+): T[] {
+  const target = schedule.find(entry => entry.id === scheduledWorkoutId && entry.workoutId !== null)
+  if (!target) throw new Error('Scheduled workout not found')
+
+  return schedule.map(entry => {
+    return entry.id === scheduledWorkoutId ? { ...entry, status } : entry
+  })
 }
 
 export function getWeeklyProgress (schedule: ScheduleEntry[], date: string) {

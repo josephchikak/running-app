@@ -23,11 +23,16 @@ describe('HistoryPage', () => {
   })
 
   it('shows saved summary metrics without a route map', async () => {
-    await repository.saveResult(result)
+    await repository.saveResult({
+      ...result,
+      plannedDate: '2026-09-27',
+      completedAt: '2026-09-28T06:35:00.000Z'
+    })
     renderWithTraining(<HistoryPage />, { repository })
 
     expect(await screen.findByText('4.20 km')).toBeVisible()
     expect(screen.getByText('30:00')).toBeVisible()
+    expect(screen.getByText(/planned 27 sept? · completed 28 sept?/i)).toBeVisible()
     expect(screen.queryByText(/route map/i)).not.toBeInTheDocument()
   })
 })

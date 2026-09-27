@@ -15,6 +15,11 @@
 - [x] Task 7: GPS filtering and live run metrics
 - [x] Task 8: Speech, wake lock, and active run orchestration
 - [ ] Task 9: Installability, offline operation, legal surfaces, and release verification — implementation complete; iPhone field check pending
+- [x] Task 10: Flexible workout selection and missed-session recovery
+  - [x] Add tested overdue-session and schedule-status domain helpers
+  - [x] Add Catch up, selectable Plan sessions, and confirmed skipping
+  - [x] Record and display planned versus actual workout dates
+  - [x] Run clean verification and push the deployment branch
 
 ## Review
 
@@ -27,3 +32,4 @@
 - Task 7: Added a foreground high-accuracy GPS adapter with named accuracy, drift, speed, and staleness thresholds. Haversine distance and rolling-window pace calculations are deterministic, and stop always releases the browser watch. Lint, 54 tests, typecheck, and production build pass.
 - Task 8: Composed the workout engine, filtered GPS, sequential speech cues, vibration fallback, screen wake lock, checkpoint restore, and local completion into a full-screen run player. Partial finishes require confirmation and are saved as stopped sessions. Lint, 59 tests, typecheck, and production build pass.
 - Task 9: Added the installable PWA manifest and service worker, black-and-orange app/icon system, route metadata, legal pages, local storage notice, install guidance, custom error fallback, robots, sitemap, and two Playwright release flows. Lint, 62 tests, typecheck, production build, dependency audit, and a 390×844 production-preview walkthrough pass. Playwright browser launch is blocked by the managed macOS sandbox, so the real-device install, offline reload, spoken cue, wake-lock, GPS, and background-behavior checks remain for an iPhone field pass.
+- Task 10: Kept the authored calendar fixed while making every unfinished run or strength session selectable. Today now surfaces overdue sessions under Catch up, Plan provides Start and confirmed Skip controls, completed results preserve both planned and actual dates, and scheduled strength sessions save into the same local history. Lint, 70 tests, typecheck, production PWA build, and a 390×844 walkthrough pass with no console errors.

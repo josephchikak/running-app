@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { StepProgress } from '../../components/StepProgress'
 import { WorkoutControls } from '../../components/WorkoutControls'
 import { exerciseCatalog } from '../../data/plans/catalog'
@@ -12,7 +12,13 @@ import {
 
 interface StrengthPageProps {
   workout: WorkoutTemplate
-  onFinish?: () => void
+  onFinish?: (result: StrengthCompletion) => void | Promise<void>
+}
+
+export interface StrengthCompletion {
+  status: 'completed' | 'stopped'
+  durationSeconds: number
+  completedStepIds: string[]
 }
 
 export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
@@ -21,6 +27,7 @@ export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
     workout,
     value => reduceWorkout(createWorkoutState(value), { type: 'START' })
   )
+  const hasReportedFinish = useRef(false)
   const step = getCurrentStep(state)
   const exercise = useMemo(() => {
     if (!step || step.kind !== 'exercise') return undefined
@@ -37,6 +44,17 @@ export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
     return () => window.clearInterval(timer)
   }, [state.status])
 
+  useEffect(() => {
+    if (state.status !== 'completed' || hasReportedFinish.current) return
+    hasReportedFinish.current = true
+    const status = state.completedStepIds.length === workout.steps.length ? 'completed' : 'stopped'
+    void onFinish?.({
+      status,
+      durationSeconds: state.totalElapsedSeconds,
+      completedStepIds: state.completedStepIds
+    })
+  }, [onFinish, state.completedStepIds, state.status, state.totalElapsedSeconds, workout.steps.length])
+
   const handlePause = useCallback(() => dispatch({ type: 'PAUSE' }), [])
   const handleResume = useCallback(() => dispatch({ type: 'RESUME' }), [])
   const handleCompleteStep = useCallback(() => dispatch({ type: 'COMPLETE_STEP' }), [])
@@ -44,8 +62,7 @@ export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
   const handleSkip = useCallback(() => dispatch({ type: 'SKIP' }), [])
   const handleFinish = useCallback(() => {
     dispatch({ type: 'FINISH' })
-    onFinish?.()
-  }, [onFinish])
+  }, [])
 
   if (state.status === 'completed' || !step) {
     return (

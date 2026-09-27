@@ -1,7 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useParams } from 'react-router-dom'
+import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
+import { expandPlanSchedule } from '../../domain/schedule'
 import { createTrainingRepository, type TrainingRepository } from '../../storage/database'
+import { enrollment } from '../../storage/test-fixtures'
 import { renderWithTraining } from '../../test/renderWithTraining'
 import { SetupCompletePage } from '../onboarding/SetupCompletePage'
 import { TodayPage } from './TodayPage'
@@ -44,4 +47,40 @@ describe('TodayPage', () => {
       await expect(repository.getEnrollment()).resolves.not.toBeNull()
     })
   })
+
+  it('offers overdue workouts without replacing today’s planned session', async () => {
+    const schedule = createStoredSchedule()
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(schedule)
+
+    renderWithTraining(
+      <Routes>
+        <Route element={<TodayPage />} path='/' />
+        <Route element={<SelectedWorkout />} path='/workout/:scheduledWorkoutId' />
+      </Routes>,
+      { repository, now: new Date('2026-09-30T08:00:00+01:00') }
+    )
+
+    expect(await screen.findByRole('heading', { name: workoutCatalog[schedule[2].workoutId ?? ''].title })).toBeVisible()
+    expect(screen.getByRole('heading', { name: /catch up/i })).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: /do easy run.*week 1 today/i }))
+
+    expect(await screen.findByText('week-1-monday-2026-09-28')).toBeVisible()
+  })
 })
+
+function SelectedWorkout () {
+  const { scheduledWorkoutId } = useParams()
+  return <p>{scheduledWorkoutId}</p>
+}
+
+function createStoredSchedule () {
+  return expandPlanSchedule(trainingCatalog, enrollment.startDate).map(entry => ({
+    id: entry.id,
+    date: entry.date,
+    weekNumber: entry.weekNumber,
+    workoutId: entry.workoutId,
+    status: entry.status
+  }))
+}

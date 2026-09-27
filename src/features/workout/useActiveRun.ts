@@ -153,10 +153,13 @@ export function useActiveRun ({
     const averagePace = state.totalDistanceMetres >= 10
       ? state.totalElapsedSeconds / (state.totalDistanceMetres / 1000)
       : null
+    const schedule = await repository.listSchedule()
+    const scheduledWorkout = schedule.find(entry => entry.id === scheduledWorkoutId)
     await repository.saveResult({
       id: `result-${Date.now()}`,
       scheduledWorkoutId,
       workoutId: workout.id,
+      plannedDate: scheduledWorkout?.date,
       completedAt: new Date().toISOString(),
       status: state.status === 'completed' ? 'completed' : 'stopped',
       durationSeconds: state.totalElapsedSeconds,
@@ -166,7 +169,6 @@ export function useActiveRun ({
       notes: ''
     })
     await repository.clearActiveSession()
-    const schedule = await repository.listSchedule()
     await repository.replaceSchedule(schedule.map(entry => {
       return entry.id === scheduledWorkoutId ? { ...entry, status: 'completed' as const } : entry
     }))

@@ -117,4 +117,22 @@ describe('training domain validation', () => {
 
     expect(result.success).toBe(false)
   })
+
+  it('records the planned date separately from the actual completion time', () => {
+    const result = WorkoutResultSchema.parse({
+      id: 'result-1',
+      scheduledWorkoutId: 'scheduled-1',
+      workoutId: 'return-easy-30',
+      plannedDate: '2026-09-24',
+      completedAt: '2026-09-25T12:00:00.000Z',
+      status: 'completed',
+      durationSeconds: 1800,
+      distanceMetres: 4800,
+      averagePaceSecondsPerKilometre: 375,
+      completedStepIds: ['warm-up'],
+      notes: ''
+    })
+
+    expect(result.plannedDate).toBe('2026-09-24')
+  })
 })

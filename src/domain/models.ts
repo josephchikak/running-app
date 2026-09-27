@@ -154,6 +154,7 @@ export const WorkoutResultSchema = z.object({
   id: IdentifierSchema,
   scheduledWorkoutId: IdentifierSchema,
   workoutId: IdentifierSchema,
+  plannedDate: LocalDateSchema.optional(),
   completedAt: TimestampSchema,
   status: z.enum(['completed', 'stopped']),
   durationSeconds: z.number().nonnegative(),

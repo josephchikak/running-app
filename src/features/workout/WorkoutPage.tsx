@@ -5,6 +5,7 @@ import { workoutCatalog } from '../../data/plans/catalog'
 import { formatPace, getPaceGuidance } from '../../domain/pace'
 import { getCurrentStep, getStepRemaining } from '../../domain/workout-engine'
 import type { WorkoutTemplate } from '../../domain/models'
+import { StrengthPage, type StrengthCompletion } from '../strength/StrengthPage'
 import { useActiveRun } from './useActiveRun'
 
 interface WorkoutPageProps {
@@ -20,13 +21,39 @@ export function WorkoutPage (props: WorkoutPageProps) {
   const scheduled = schedule.find(entry => entry.id === scheduledWorkoutId)
   const workout = props.workout ?? (scheduled?.workoutId ? workoutCatalog[scheduled.workoutId] : undefined)
 
-  if (!workout || workout.kind !== 'run') {
-    return <section className='run-player run-player--message'><h1>Run not found</h1><p>Return to Today and choose a scheduled run.</p></section>
+  if (!workout) {
+    return <section className='run-player run-player--message'><h1>Workout not found</h1><p>Return to Today and choose a scheduled workout.</p></section>
   }
 
   const handleFinished = async () => {
     await refresh()
     navigate('/history')
+  }
+
+  const handleStrengthFinished = async (result: StrengthCompletion) => {
+    const completedAt = new Date().toISOString()
+    await repository.saveResult({
+      id: `result-${Date.now()}`,
+      scheduledWorkoutId,
+      workoutId: workout.id,
+      plannedDate: scheduled?.date,
+      completedAt,
+      status: result.status,
+      durationSeconds: result.durationSeconds,
+      distanceMetres: 0,
+      averagePaceSecondsPerKilometre: null,
+      completedStepIds: result.completedStepIds,
+      notes: ''
+    })
+    const savedSchedule = await repository.listSchedule()
+    await repository.replaceSchedule(savedSchedule.map(entry => {
+      return entry.id === scheduledWorkoutId ? { ...entry, status: 'completed' as const } : entry
+    }))
+    await handleFinished()
+  }
+
+  if (workout.kind === 'strength') {
+    return <StrengthPage onFinish={handleStrengthFinished} workout={workout} />
   }
 
   return <ActiveRunScreen scheduledWorkoutId={scheduledWorkoutId} workout={workout} onFinished={handleFinished} settings={settings} repository={repository} />

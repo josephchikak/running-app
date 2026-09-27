@@ -214,18 +214,69 @@ a:focus-visible {
 
 .week-sessions li {
   display: grid;
-  grid-template-columns: 5.5rem 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
-  padding: 0.65rem 0;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgb(255 247 237 / 9%);
 }
 
-.week-sessions span {
+.week-session__summary {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.week-session__summary span,
+.session-status {
   color: var(--color-muted);
   font-size: 0.76rem;
 }
 
-.week-sessions strong {
+.week-session__summary strong {
   font-size: 0.86rem;
+}
+
+.session-status {
+  color: var(--color-action);
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.scheduled-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.scheduled-actions button {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgb(255 247 237 / 22%);
+  border-radius: 0.45rem;
+  color: var(--color-text);
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.scheduled-actions .scheduled-actions__start {
+  border-color: var(--color-action);
+  color: #080808;
+  background: var(--color-action);
+}
+
+.scheduled-actions__confirmation {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  color: var(--color-muted);
+  font-size: 0.76rem;
+}
+
+.scheduled-actions__confirmation button:first-of-type {
+  border-color: var(--color-hard);
+  color: var(--color-hard);
 }
 
 .empty-state {
@@ -624,6 +675,51 @@ a:focus-visible {
 .session-state,
 .session-summary {
   color: var(--color-muted);
+}
+
+.session-outcome {
+  margin-top: auto;
+  padding: 1rem;
+  border-left: 3px solid var(--color-action);
+  color: var(--color-action);
+  background: rgb(255 106 0 / 8%);
+  font-weight: 750;
+}
+
+.catch-up {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgb(255 247 237 / 16%);
+}
+
+.today-content .catch-up h2 {
+  max-width: none;
+  font: 600 2.5rem/1 'Barlow Condensed', sans-serif;
+}
+
+.catch-up ol {
+  display: grid;
+  gap: 0;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.catch-up li {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(255 247 237 / 12%);
+}
+
+.catch-up time {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+
+.catch-up h3 {
+  margin: 0.2rem 0 0;
+  font: 600 1.4rem 'Barlow Condensed', sans-serif;
 }
 
 .date-line {
