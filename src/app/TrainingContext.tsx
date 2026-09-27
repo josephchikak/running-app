@@ -38,6 +38,7 @@ interface TrainingContextValue {
   saveSettings: (settings: UserSettings) => Promise<void>
   restoreBackup: (json: string) => Promise<void>
   eraseAllData: () => Promise<void>
+  refresh: () => Promise<void>
 }
 
 const TrainingContext = createContext<TrainingContextValue | null>(null)
@@ -150,7 +151,8 @@ export function TrainingProvider ({
     startPlan,
     saveSettings,
     restoreBackup,
-    eraseAllData
+    eraseAllData,
+    refresh: reload
   }), [
     repository,
     today,
@@ -163,7 +165,8 @@ export function TrainingProvider ({
     startPlan,
     saveSettings,
     restoreBackup,
-    eraseAllData
+    eraseAllData,
+    reload
   ])
 
   return <TrainingContext.Provider value={value}>{children}</TrainingContext.Provider>

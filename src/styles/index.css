@@ -55,6 +55,16 @@ a:focus-visible {
   margin: 0 auto;
 }
 
+.app-shell--workout {
+  padding-bottom: 0;
+}
+
+.app-shell--workout .app-main {
+  width: 100%;
+  max-width: none;
+  padding-left: 0;
+}
+
 .today-page,
 .placeholder-page,
 .page-surface {
@@ -373,6 +383,138 @@ a:focus-visible {
 .route-loading {
   padding: 2rem;
   color: var(--color-muted);
+}
+
+.run-player {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: max(1rem, env(safe-area-inset-top)) 1.25rem max(1rem, env(safe-area-inset-bottom));
+  color: #f5f2e8;
+  background: #071c1d;
+}
+
+.run-player__status {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.capability {
+  color: #9aa9a5;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.capability--tracking {
+  color: var(--color-easy);
+}
+
+.capability--weak,
+.capability--error {
+  color: var(--color-hard);
+}
+
+.run-player__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.run-player h1 {
+  max-width: 12ch;
+  margin: 0.5rem 0;
+  font: 600 clamp(3rem, 15vw, 5.5rem) / 0.88 'Barlow Condensed', sans-serif;
+}
+
+.run-player__countdown {
+  margin: 1rem 0;
+  color: var(--color-action);
+  font: 600 clamp(5rem, 25vw, 9rem) / 0.8 'Barlow Condensed', sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-player__instruction,
+.run-player__guidance {
+  max-width: 34rem;
+  line-height: 1.5;
+}
+
+.run-player__guidance {
+  color: var(--color-easy);
+}
+
+.run-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 1.25rem 0;
+  padding: 1rem 0;
+  border-block: 1px solid rgb(245 242 232 / 14%);
+}
+
+.run-metrics div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.run-metrics dt,
+.run-player__next span {
+  color: var(--color-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.run-metrics dd {
+  margin: 0;
+  font: 600 1.25rem 'Barlow Condensed', sans-serif;
+}
+
+.run-player__next {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.run-player__controls {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.run-player__controls > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.run-player__controls > div button {
+  min-height: 3rem;
+  border: 1px solid rgb(245 242 232 / 20%);
+  border-radius: 0.5rem;
+  color: var(--color-muted);
+  background: transparent;
+}
+
+.run-player__controls .finish-confirmation {
+  grid-template-columns: 1fr 1fr;
+  padding: 0.8rem;
+  border: 1px solid var(--color-hard);
+  background: rgb(240 121 94 / 8%);
+}
+
+.finish-confirmation p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #ffd5cc;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.run-player--message {
+  justify-content: center;
 }
 
 .page-header {

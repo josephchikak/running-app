@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 interface NavigationItem {
   label: string
@@ -6,12 +6,15 @@ interface NavigationItem {
 }
 
 export function AppShell () {
+  const location = useLocation()
+  const isActiveWorkout = location.pathname.startsWith('/workout/')
+
   return (
-    <div className='app-shell'>
+    <div className={isActiveWorkout ? 'app-shell app-shell--workout' : 'app-shell'}>
       <main className='app-main'>
         <Outlet />
       </main>
-      <PrimaryNavigation />
+      {!isActiveWorkout && <PrimaryNavigation />}
     </div>
   )
 }

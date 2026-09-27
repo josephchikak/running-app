@@ -13,7 +13,7 @@
 - [x] Task 5: IndexedDB, recovery, and backup
 - [x] Task 6: Today, Plan, History, and Settings screens
 - [x] Task 7: GPS filtering and live run metrics
-- [ ] Task 8: Speech, wake lock, and active run orchestration
+- [x] Task 8: Speech, wake lock, and active run orchestration
 - [ ] Task 9: Installability, offline operation, legal surfaces, and release verification
 
 ## Review
@@ -25,3 +25,4 @@
 - Task 5: Added schema-validated IndexedDB stores for settings, enrollment, schedule, active checkpoints, results, and local-only counters. Versioned backup export/import replaces data atomically only after full validation and never serializes route coordinates. Lint, 37 tests, typecheck, build, and dependency audit pass.
 - Task 6: Replaced shell placeholders with tested enrollment, setup confirmation, Today, 17-week Plan, summary-only History, and Settings flows. Settings includes baseline/cues, validated backup/restore, and confirmed local erasure. Non-critical routes are split into lazy chunks. Lint, 46 tests, typecheck, build, and a 375×812 visual check pass.
 - Task 7: Added a foreground high-accuracy GPS adapter with named accuracy, drift, speed, and staleness thresholds. Haversine distance and rolling-window pace calculations are deterministic, and stop always releases the browser watch. Lint, 54 tests, typecheck, and production build pass.
+- Task 8: Composed the workout engine, filtered GPS, sequential speech cues, vibration fallback, screen wake lock, checkpoint restore, and local completion into a full-screen run player. Partial finishes require confirmation and are saved as stopped sessions. Lint, 59 tests, typecheck, and production build pass.

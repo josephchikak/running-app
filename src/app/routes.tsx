@@ -7,6 +7,7 @@ import { AppShell } from './AppShell'
 const PlanPage = lazy(() => import('../features/plan/PlanPage').then(module => ({ default: module.PlanPage })))
 const SettingsPage = lazy(() => import('../features/settings/SettingsPage').then(module => ({ default: module.SettingsPage })))
 const SetupCompletePage = lazy(() => import('../features/onboarding/SetupCompletePage').then(module => ({ default: module.SetupCompletePage })))
+const WorkoutPage = lazy(() => import('../features/workout/WorkoutPage').then(module => ({ default: module.WorkoutPage })))
 
 function LoadingPage () {
   return <p className='route-loading' role='status'>Opening…</p>
@@ -30,6 +31,7 @@ export const router = createHashRouter([
       { path: 'history', element: <HistoryPage /> },
       { path: 'settings', element: deferred(<SettingsPage />) },
       { path: 'setup-complete', element: deferred(<SetupCompletePage />) },
+      { path: 'workout/:scheduledWorkoutId', element: deferred(<WorkoutPage />) },
       { path: '*', element: <NotFoundPage /> }
     ]
   }
