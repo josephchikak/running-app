@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { createHashRouter } from 'react-router-dom'
 import { HistoryPage } from '../features/history/HistoryPage'
+import { LegalPage } from '../features/legal/LegalPages'
 import { TodayPage } from '../features/today/TodayPage'
 import { AppShell } from './AppShell'
 
@@ -32,6 +33,8 @@ export const router = createHashRouter([
       { path: 'settings', element: deferred(<SettingsPage />) },
       { path: 'setup-complete', element: deferred(<SetupCompletePage />) },
       { path: 'workout/:scheduledWorkoutId', element: deferred(<WorkoutPage />) },
+      { path: 'privacy', element: <LegalPage type='privacy' /> },
+      { path: 'terms', element: <LegalPage type='terms' /> },
       { path: '*', element: <NotFoundPage /> }
     ]
   }

@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'>
+  <rect width='1200' height='630' fill='#080808'/>
+  <path d='M110 520V110' stroke='#4A2A16' stroke-width='5'/>
+  <circle cx='110' cy='110' r='16' fill='#FF6A00'/>
+  <circle cx='110' cy='520' r='15' fill='#080808' stroke='#B8ADA3' stroke-width='5'/>
+  <text x='180' y='260' fill='#FFF7ED' font-family='Arial Narrow, sans-serif' font-size='120' font-weight='700'>RUNNING COACH</text>
+  <text x='185' y='350' fill='#B8ADA3' font-family='Arial, sans-serif' font-size='38'>Your run. Your plan. One step at a time.</text>
+</svg>

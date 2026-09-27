@@ -6,12 +6,12 @@ This is a personal endurance instrument used outdoors, often at a glance and whi
 
 ## Tokens
 
-- Deep petrol `#103638`: primary field, calmer and more specific than generic fitness black
-- Pool tile `#1B4D4F`: raised or selected surfaces
-- Track chalk `#F5F2E8`: primary text and daylight-friendly contrast
-- Split yellow `#F4C453`: current action and progress marker
-- Interval coral `#F0795E`: hard-effort and urgent state
-- Recovery mint `#9CCFBD`: easy/recovery state
+- Night black `#080808`: primary field for a focused, low-distraction running interface
+- Burnt surface `#21150E`: raised or selected surfaces with subtle warmth
+- Track chalk `#FFF7ED`: primary text and daylight-friendly contrast
+- Signal orange `#FF6A00`: current action and progress marker
+- Sprint orange `#FF3D00`: hard-effort and urgent state
+- Recovery amber `#FFAA4C`: easy/recovery state
 
 Typography uses packaged Manrope for instructions and Barlow Condensed for pace, time, and distance. Large numbers behave like a runner’s watch; prose remains open and highly legible.
 
@@ -48,4 +48,3 @@ Content is left-aligned. The active metric may span the full width, but secondar
 ## Self-critique and revision
 
 The initial instinct—dark background plus a bright performance accent—would resemble many generic fitness apps. The direction is revised toward deep petrol, chalk, and split yellow, with a lane-like pace rail as the single memorable device. Gradients, neon glows, excessive pills, all-caps labels, and interchangeable SaaS cards are excluded.
-

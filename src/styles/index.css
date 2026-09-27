@@ -9,18 +9,18 @@
 }
 
 :root {
-  color: #f5f2e8;
-  background: #103638;
+  color: #fff7ed;
+  background: #080808;
   font-family: 'Manrope Variable', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --color-field: #103638;
-  --color-surface: #1b4d4f;
-  --color-text: #f5f2e8;
-  --color-muted: #b9c9c3;
-  --color-action: #f4c453;
-  --color-hard: #f0795e;
-  --color-easy: #9ccfbd;
+  --color-field: #080808;
+  --color-surface: #21150e;
+  --color-text: #fff7ed;
+  --color-muted: #b8ada3;
+  --color-action: #ff6a00;
+  --color-hard: #ff3d00;
+  --color-easy: #ffaa4c;
 }
 
 * {
@@ -109,7 +109,7 @@ a:focus-visible {
   padding: 0.9rem 1rem;
   border-left: 3px solid var(--color-action);
   color: var(--color-muted);
-  background: rgb(245 242 232 / 6%);
+  background: rgb(255 247 237 / 6%);
   line-height: 1.45;
 }
 
@@ -183,7 +183,7 @@ a:focus-visible {
 }
 
 .plan-week {
-  border-top: 1px solid rgb(245 242 232 / 16%);
+  border-top: 1px solid rgb(255 247 237 / 16%);
 }
 
 .plan-week > button {
@@ -236,7 +236,7 @@ a:focus-visible {
 }
 
 .empty-state > span {
-  color: rgb(244 196 83 / 30%);
+  color: rgb(255 106 0 / 32%);
   font: 600 8rem/0.8 'Barlow Condensed', sans-serif;
 }
 
@@ -261,7 +261,7 @@ a:focus-visible {
 
 .history-list > li {
   padding: 1.1rem;
-  border: 1px solid rgb(245 242 232 / 16%);
+  border: 1px solid rgb(255 247 237 / 16%);
 }
 
 .history-list time {
@@ -299,7 +299,7 @@ a:focus-visible {
 .settings-section {
   margin: 0 -0.25rem;
   padding: 1.5rem 0.25rem;
-  border-top: 1px solid rgb(245 242 232 / 16%);
+  border-top: 1px solid rgb(255 247 237 / 16%);
 }
 
 .settings-section > label:not(.toggle-row) {
@@ -311,10 +311,10 @@ a:focus-visible {
 .settings-section input:not([type='checkbox']) {
   min-height: 3.3rem;
   padding: 0 0.8rem;
-  border: 1px solid rgb(245 242 232 / 28%);
+  border: 1px solid rgb(255 247 237 / 28%);
   border-radius: 0.4rem;
   color: var(--color-text);
-  background: rgb(245 242 232 / 5%);
+  background: rgb(255 247 237 / 5%);
   font: 600 1.4rem 'Barlow Condensed', sans-serif;
 }
 
@@ -330,7 +330,7 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   min-height: 3.2rem;
-  border-top: 1px solid rgb(245 242 232 / 10%);
+  border-top: 1px solid rgb(255 247 237 / 10%);
 }
 
 .toggle-row input {
@@ -344,7 +344,7 @@ a:focus-visible {
 .settings-section--danger > button {
   min-height: 3rem;
   padding: 0 1rem;
-  border: 1px solid rgb(245 242 232 / 24%);
+  border: 1px solid rgb(255 247 237 / 24%);
   border-radius: 0.4rem;
   color: var(--color-text);
   background: transparent;
@@ -354,7 +354,7 @@ a:focus-visible {
 .section-action {
   width: 100%;
   border-color: var(--color-action);
-  color: #173536;
+  color: #080808;
   background: var(--color-action);
 }
 
@@ -366,7 +366,7 @@ a:focus-visible {
 
 .settings-section--danger button {
   border-color: var(--color-hard);
-  color: #ffd5cc;
+  color: #ffd8c2;
 }
 
 .visually-hidden {
@@ -385,13 +385,103 @@ a:focus-visible {
   color: var(--color-muted);
 }
 
+.storage-notice {
+  position: fixed;
+  z-index: 20;
+  right: 0.75rem;
+  bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  left: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.8rem;
+  border: 1px solid rgb(255 247 237 / 20%);
+  background: #1a110c;
+  box-shadow: 0 0.7rem 2rem rgb(0 0 0 / 24%);
+}
+
+.storage-notice p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.storage-notice a,
+.legal-page a,
+.legal-links a {
+  color: var(--color-action);
+}
+
+.storage-notice button {
+  min-height: 2.5rem;
+  padding: 0 0.8rem;
+  border: 0;
+  border-radius: 0.35rem;
+  color: #080808;
+  background: var(--color-action);
+  font-weight: 750;
+}
+
+.legal-page {
+  max-width: 46rem;
+}
+
+.legal-page h2 {
+  margin: 2rem 0 0.5rem;
+  font: 600 1.75rem 'Barlow Condensed', sans-serif;
+}
+
+.legal-page p {
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.install-steps {
+  padding-left: 1.3rem;
+  color: var(--color-text);
+  line-height: 1.8;
+}
+
+.legal-links {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1rem 0 2rem;
+  font-size: 0.78rem;
+}
+
+.fatal-error {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text);
+  background: var(--color-field);
+}
+
+.fatal-error h1 {
+  max-width: 12ch;
+  font: 600 4rem/0.9 'Barlow Condensed', sans-serif;
+}
+
+.fatal-error button {
+  min-height: 3.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #080808;
+  background: var(--color-action);
+  font-weight: 750;
+}
+
 .run-player {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
   padding: max(1rem, env(safe-area-inset-top)) 1.25rem max(1rem, env(safe-area-inset-bottom));
-  color: #f5f2e8;
-  background: #071c1d;
+  color: #fff7ed;
+  background: #000;
 }
 
 .run-player__status {
@@ -401,7 +491,7 @@ a:focus-visible {
 }
 
 .capability {
-  color: #9aa9a5;
+  color: #a99e94;
   font-size: 0.68rem;
   font-weight: 750;
   letter-spacing: 0.06em;
@@ -453,7 +543,7 @@ a:focus-visible {
   grid-template-columns: repeat(3, 1fr);
   margin: 1.25rem 0;
   padding: 1rem 0;
-  border-block: 1px solid rgb(245 242 232 / 14%);
+  border-block: 1px solid rgb(255 247 237 / 14%);
 }
 
 .run-metrics div {
@@ -492,7 +582,7 @@ a:focus-visible {
 
 .run-player__controls > div button {
   min-height: 3rem;
-  border: 1px solid rgb(245 242 232 / 20%);
+  border: 1px solid rgb(255 247 237 / 20%);
   border-radius: 0.5rem;
   color: var(--color-muted);
   background: transparent;
@@ -502,13 +592,13 @@ a:focus-visible {
   grid-template-columns: 1fr 1fr;
   padding: 0.8rem;
   border: 1px solid var(--color-hard);
-  background: rgb(240 121 94 / 8%);
+  background: rgb(255 61 0 / 10%);
 }
 
 .finish-confirmation p {
   grid-column: 1 / -1;
   margin: 0;
-  color: #ffd5cc;
+  color: #ffd8c2;
   font-size: 0.82rem;
   line-height: 1.4;
 }
@@ -602,7 +692,7 @@ a:focus-visible {
   margin-top: auto;
   border: 0;
   border-radius: 0.6rem;
-  color: #173536;
+  color: #080808;
   background: var(--color-action);
   font-weight: 750;
 }
@@ -617,8 +707,8 @@ a:focus-visible {
   grid-template-columns: repeat(4, 1fr);
   min-height: calc(4.5rem + env(safe-area-inset-bottom));
   padding: 0 0.75rem env(safe-area-inset-bottom);
-  border-top: 1px solid rgb(245 242 232 / 16%);
-  background: rgb(16 54 56 / 96%);
+  border-top: 1px solid rgb(255 247 237 / 16%);
+  background: rgb(8 8 8 / 96%);
   backdrop-filter: blur(18px);
 }
 
@@ -627,7 +717,7 @@ a:focus-visible {
   flex-direction: column;
   min-height: 100dvh;
   padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
-  background: #0c2c2e;
+  background: #0d0b09;
 }
 
 .strength-player__header {
@@ -660,7 +750,7 @@ a:focus-visible {
 .step-progress__track {
   height: 0.35rem;
   overflow: hidden;
-  background: rgb(245 242 232 / 14%);
+  background: rgb(255 247 237 / 14%);
 }
 
 .step-progress__fill {
@@ -719,7 +809,7 @@ a:focus-visible {
 
 .workout-controls button {
   min-height: 3.25rem;
-  border: 1px solid rgb(245 242 232 / 28%);
+  border: 1px solid rgb(255 247 237 / 28%);
   border-radius: 0.55rem;
   color: var(--color-text);
   background: transparent;
@@ -734,7 +824,7 @@ a:focus-visible {
 .workout-controls .workout-controls__primary {
   min-height: 4rem;
   border-color: var(--color-action);
-  color: #173536;
+  color: #080808;
   background: var(--color-action);
 }
 
@@ -778,11 +868,17 @@ a:focus-visible {
     align-content: center;
     height: 100dvh;
     border-top: 0;
-    border-right: 1px solid rgb(245 242 232 / 16%);
+    border-right: 1px solid rgb(255 247 237 / 16%);
   }
 
   .app-main {
     padding-left: 7rem;
+  }
+
+  .storage-notice {
+    bottom: 1rem;
+    left: 8rem;
+    max-width: 34rem;
   }
 }
 

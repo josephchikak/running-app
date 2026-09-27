@@ -1,4 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { StorageNotice } from '../components/StorageNotice'
+import { RouteMeta } from './RouteMeta'
 
 interface NavigationItem {
   label: string
@@ -11,9 +13,11 @@ export function AppShell () {
 
   return (
     <div className={isActiveWorkout ? 'app-shell app-shell--workout' : 'app-shell'}>
+      <RouteMeta />
       <main className='app-main'>
         <Outlet />
       </main>
+      {!isActiveWorkout && <StorageNotice />}
       {!isActiveWorkout && <PrimaryNavigation />}
     </div>
   )

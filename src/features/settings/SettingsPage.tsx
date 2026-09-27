@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type ChangeEvent } from 'react'
 import { useTraining } from '../../app/TrainingContext'
+import { InstallHelp } from '../../components/InstallHelp'
 import { exportBackup } from '../../storage/backup'
 
 export function SettingsPage () {
@@ -111,6 +112,12 @@ function SettingsForm () {
           </div>
         )}
       </section>
+      <InstallHelp />
+      <nav aria-label='Legal' className='legal-links'>
+        <a href='#/privacy'>Privacy</a>
+        <a href='#/terms'>Terms</a>
+        <a href='mailto:raytheboffin@gmail.com'>Contact</a>
+      </nav>
       {message && <p className='status-message' role='status'>{message}</p>}
     </section>
   )
