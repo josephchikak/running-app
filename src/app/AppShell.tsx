@@ -1,8 +1,10 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { AppIcon, type AppIconName } from '../components/AppIcon'
 import { StorageNotice } from '../components/StorageNotice'
 import { RouteMeta } from './RouteMeta'
 
 interface NavigationItem {
+  icon: AppIconName
   label: string
   to: string
 }
@@ -33,7 +35,8 @@ function PrimaryNavigation () {
           key={item.to}
           to={item.to}
         >
-          {item.label}
+          <AppIcon name={item.icon} />
+          <span>{item.label}</span>
         </NavLink>
       ))}
     </nav>
@@ -41,8 +44,8 @@ function PrimaryNavigation () {
 }
 
 const navigationItems: NavigationItem[] = [
-  { label: 'Today', to: '/' },
-  { label: 'Plan', to: '/plan' },
-  { label: 'History', to: '/history' },
-  { label: 'Settings', to: '/settings' }
+  { icon: 'today', label: 'Today', to: '/' },
+  { icon: 'plan', label: 'Plan', to: '/plan' },
+  { icon: 'history', label: 'History', to: '/history' },
+  { icon: 'settings', label: 'Settings', to: '/settings' }
 ]

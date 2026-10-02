@@ -9,5 +9,6 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: /today/i })).toBeVisible()
     expect(screen.getByRole('navigation', { name: /primary/i })).toBeVisible()
     expect(screen.getByRole('link', { name: /plan/i })).toBeVisible()
+    expect(screen.getByRole('link', { name: /today/i })).toHaveAttribute('aria-current', 'page')
   })
 })

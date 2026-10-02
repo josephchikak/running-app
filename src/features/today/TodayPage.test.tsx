@@ -4,7 +4,7 @@ import { Route, Routes, useParams } from 'react-router-dom'
 import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
 import { expandPlanSchedule } from '../../domain/schedule'
 import { createTrainingRepository, type TrainingRepository } from '../../storage/database'
-import { enrollment } from '../../storage/test-fixtures'
+import { enrollment, result } from '../../storage/test-fixtures'
 import { renderWithTraining } from '../../test/renderWithTraining'
 import { SetupCompletePage } from '../onboarding/SetupCompletePage'
 import { TodayPage } from './TodayPage'
@@ -29,6 +29,8 @@ describe('TodayPage', () => {
       { repository, now: new Date('2026-09-28T08:00:00+01:00') }
     )
 
+    expect(screen.queryByRole('region', { name: /this week/i })).not.toBeInTheDocument()
+
     fireEvent.click(await screen.findByRole('button', { name: /start plan/i }))
 
     expect(await screen.findByRole('heading', { name: /plan ready/i })).toBeVisible()
@@ -46,6 +48,30 @@ describe('TodayPage', () => {
     await waitFor(async () => {
       await expect(repository.getEnrollment()).resolves.not.toBeNull()
     })
+  })
+
+  it('shows the current training week and real saved totals', async () => {
+    const schedule = createStoredSchedule().map((entry, index) => ({
+      ...entry,
+      status: index === 0 ? 'completed' as const : entry.status
+    }))
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(schedule)
+    await repository.saveResult({
+      ...result,
+      scheduledWorkoutId: schedule[0].id,
+      workoutId: schedule[0].workoutId ?? result.workoutId
+    })
+
+    renderWithTraining(<TodayPage />, {
+      repository,
+      now: new Date('2026-09-28T08:00:00+01:00')
+    })
+
+    expect(await screen.findByRole('list', { name: /training week/i })).toBeVisible()
+    expect(screen.getByRole('region', { name: /this week/i })).toHaveTextContent('1 session')
+    expect(screen.getByRole('region', { name: /this week/i })).toHaveTextContent('30 min')
+    expect(screen.getByRole('region', { name: /this week/i })).toHaveTextContent('4.20 km')
   })
 
   it('offers overdue workouts without replacing today’s planned session', async () => {
