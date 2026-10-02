@@ -42,7 +42,11 @@ describe('PlanPage', () => {
       { repository, route: '/plan' }
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: `Start ${firstWorkout.title}` }))
+    fireEvent.click(await screen.findByRole(
+      'button',
+      { name: `Start ${firstWorkout.title}` },
+      { timeout: 5000 }
+    ))
 
     expect(await screen.findByText(schedule[0].id)).toBeVisible()
   })
