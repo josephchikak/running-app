@@ -82,16 +82,27 @@ function SettingsForm () {
   return (
     <section className='page-surface settings-page'>
       <header className='feature-header'><div><p className='page-kicker'>On this phone</p><h1>Settings</h1></div></header>
-      <section className='settings-section'>
-        <h2>Training</h2>
-        <label>Current 5K time<input aria-describedby='baseline-help' onChange={handleBaselineChange} value={baseline} /></label>
-        <p id='baseline-help'>Used only to calculate pace guidance. Effort always wins.</p>
-        <label className='toggle-row'><span>Spoken cues</span><input checked={speechEnabled} onChange={handleSpeechChange} type='checkbox' /></label>
-        <label className='toggle-row'><span>Vibration fallback</span><input checked={vibrationEnabled} onChange={handleVibrationChange} type='checkbox' /></label>
+      <section aria-labelledby='training-settings-title' className='settings-section'>
+        <div className='settings-section__heading'>
+          <p>01</p>
+          <div><h2 id='training-settings-title'>Training</h2><span>Personal pace and coaching cues</span></div>
+        </div>
+        <label className='settings-field'>
+          <span>Current 5K time</span>
+          <input aria-describedby='baseline-help' inputMode='numeric' onChange={handleBaselineChange} value={baseline} />
+        </label>
+        <p className='settings-help' id='baseline-help'>Used only to calculate pace guidance. Effort always wins.</p>
+        <div className='settings-control-list'>
+          <label className='toggle-row'><span><strong>Spoken cues</strong><small>Hear each step while you run</small></span><input checked={speechEnabled} onChange={handleSpeechChange} role='switch' type='checkbox' /></label>
+          <label className='toggle-row'><span><strong>Vibration fallback</strong><small>Feel transitions when audio is unavailable</small></span><input checked={vibrationEnabled} onChange={handleVibrationChange} role='switch' type='checkbox' /></label>
+        </div>
         <button className='section-action' onClick={handleSave} type='button'>Save settings</button>
       </section>
-      <section className='settings-section'>
-        <h2>Backup</h2>
+      <section aria-labelledby='backup-settings-title' className='settings-section'>
+        <div className='settings-section__heading'>
+          <p>02</p>
+          <div><h2 id='backup-settings-title'>Backup</h2><span>Your plan stays under your control</span></div>
+        </div>
         <p>Move your plan and summaries with one versioned JSON file. Raw routes are never included.</p>
         <div className='button-pair'>
           <button onClick={handleExport} type='button'>Export backup</button>
@@ -99,8 +110,24 @@ function SettingsForm () {
         </div>
         <input accept='application/json' className='visually-hidden' onChange={handleImport} ref={fileInput} type='file' />
       </section>
-      <section className='settings-section settings-section--danger'>
-        <h2>Erase data</h2>
+      <InstallHelp />
+      <section aria-labelledby='about-settings-title' className='settings-section'>
+        <div className='settings-section__heading'>
+          <p>04</p>
+          <div><h2 id='about-settings-title'>About</h2><span>Running Coach · private by design</span></div>
+        </div>
+        <p>Your workouts and history stay in this browser unless you export a backup.</p>
+        <nav aria-label='Legal' className='legal-links'>
+          <a href='#/privacy'>Privacy</a>
+          <a href='#/terms'>Terms</a>
+          <a href='mailto:raytheboffin@gmail.com'>Contact</a>
+        </nav>
+      </section>
+      <section aria-labelledby='erase-settings-title' className='settings-section settings-section--danger'>
+        <div className='settings-section__heading'>
+          <p>05</p>
+          <div><h2 id='erase-settings-title'>Erase data</h2><span>Remove everything stored on this phone</span></div>
+        </div>
         {!isConfirmingErase && <button onClick={handleAskErase} type='button'>Erase local data</button>}
         {isConfirmingErase && (
           <div role='alert'>
@@ -112,12 +139,6 @@ function SettingsForm () {
           </div>
         )}
       </section>
-      <InstallHelp />
-      <nav aria-label='Legal' className='legal-links'>
-        <a href='#/privacy'>Privacy</a>
-        <a href='#/terms'>Terms</a>
-        <a href='mailto:raytheboffin@gmail.com'>Contact</a>
-      </nav>
       {message && <p className='status-message' role='status'>{message}</p>}
     </section>
   )

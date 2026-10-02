@@ -23,7 +23,7 @@
 - [ ] Task 11: Black-and-orange Track Cockpit UI redesign
   - [x] Add tested real-data training summaries and shared presentation primitives
   - [x] Redesign the app shell, navigation, and Today cockpit
-  - [ ] Redesign Plan, History, and Settings
+  - [x] Redesign Plan, History, and Settings
   - [ ] Redesign active run and strength players
   - [ ] Complete responsive visual QA, release verification, and push
 

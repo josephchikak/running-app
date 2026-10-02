@@ -17,6 +17,13 @@ beforeEach(async () => {
 afterEach(async () => repository.destroy())
 
 describe('SettingsPage', () => {
+  it('exposes cue preferences as switches', async () => {
+    renderWithTraining(<SettingsPage />, { repository })
+
+    expect(await screen.findByRole('switch', { name: /spoken cues/i })).toBeChecked()
+    expect(screen.getByRole('switch', { name: /vibration fallback/i })).toBeChecked()
+  })
+
   it('updates the five-k baseline and cue preferences', async () => {
     renderWithTraining(<SettingsPage />, { repository })
 
