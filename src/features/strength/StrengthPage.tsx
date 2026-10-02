@@ -84,7 +84,7 @@ export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
         <StepProgress current={state.currentStepIndex + 1} total={workout.steps.length} />
       </header>
 
-      <div className='strength-player__content'>
+      <main className='strength-player__content'>
         <p className='strength-player__kind'>{step.kind === 'rest' ? 'Recover' : 'Current exercise'}</p>
         <h1>{step.title}</h1>
         <p className='strength-player__metric'>
@@ -97,7 +97,7 @@ export function StrengthPage ({ workout, onFinish }: StrengthPageProps) {
             <p>{exercise.easierVariation}</p>
           </aside>
         )}
-      </div>
+      </main>
 
       <WorkoutControls
         canGoBack={state.currentStepIndex > 0}

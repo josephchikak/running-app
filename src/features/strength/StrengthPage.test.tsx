@@ -39,6 +39,14 @@ afterEach(() => {
 })
 
 describe('StrengthPage', () => {
+  it('labels progress and controls for an active strength session', () => {
+    vi.useFakeTimers()
+    render(<StrengthPage workout={strengthWorkout} />)
+
+    expect(screen.getByRole('progressbar', { name: /workout progress/i })).toHaveAttribute('aria-valuenow', '1')
+    expect(screen.getByRole('group', { name: /strength controls/i })).toBeVisible()
+  })
+
   it('pauses a strength countdown without consuming time', () => {
     vi.useFakeTimers()
     render(<StrengthPage workout={strengthWorkout} />)

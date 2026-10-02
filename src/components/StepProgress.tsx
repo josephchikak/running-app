@@ -19,6 +19,7 @@ export const StepProgress = memo(function StepProgress ({ current, total }: Step
         aria-valuemax={total}
         aria-valuemin={1}
         aria-valuenow={current}
+        aria-valuetext={`Step ${current} of ${total}`}
         className='step-progress__track'
         role='progressbar'
       >

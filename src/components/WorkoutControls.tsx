@@ -24,7 +24,7 @@ export const WorkoutControls = memo(function WorkoutControls ({
   onFinish
 }: WorkoutControlsProps) {
   return (
-    <div className='workout-controls'>
+    <div aria-label='Strength controls' className='workout-controls' role='group'>
       {isManualStep && (
         <button className='workout-controls__primary' onClick={onCompleteStep} type='button'>
           Complete set

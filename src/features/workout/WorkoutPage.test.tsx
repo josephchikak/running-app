@@ -51,6 +51,8 @@ describe('WorkoutPage', () => {
     )
 
     expect(await screen.findByRole('button', { name: /start run/i })).toBeVisible()
+    expect(screen.getByRole('progressbar', { name: /workout progress/i })).toHaveAttribute('aria-valuenow', '1')
+    expect(screen.getByRole('group', { name: /live run metrics/i })).toBeVisible()
     expect(screen.getByText(/gps idle/i)).toBeVisible()
     expect(screen.getByText(/screen lock off/i)).toBeVisible()
     fireEvent.click(screen.getByRole('button', { name: /^finish$/i }))

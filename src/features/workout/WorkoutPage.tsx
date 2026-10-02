@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTraining } from '../../app/TrainingContext'
+import { StepProgress } from '../../components/StepProgress'
 import { workoutCatalog } from '../../data/plans/catalog'
 import { formatPace, getPaceGuidance } from '../../domain/pace'
 import { getCurrentStep, getStepRemaining } from '../../domain/workout-engine'
@@ -102,12 +103,18 @@ function ActiveRunScreen ({ scheduledWorkoutId, workout, repository, settings, o
         <span className={controller.isWakeLockHeld ? 'capability capability--tracking' : 'capability'}>Screen lock {controller.isWakeLockHeld ? 'on' : 'off'}</span>
       </header>
       <main className='run-player__main'>
-        <p className='page-kicker'>Step {controller.state.currentStepIndex + 1} of {workout.steps.length}</p>
-        <h1>{step.title}</h1>
-        <p className='run-player__countdown'>{step.completion.type === 'distance' ? `${(remaining / 1000).toFixed(2)} km` : formatDuration(remaining)}</p>
-        <p className='run-player__instruction'>{step.instruction}</p>
-        {guidance && <p className='run-player__guidance'>{formatPace(guidance.minimumSecondsPerKilometre)}–{formatPace(guidance.maximumSecondsPerKilometre)} · {guidance.effort}</p>}
-        <dl className='run-metrics'>
+        <div className='run-player__progress'>
+          <p className='page-kicker'>{workout.title}</p>
+          <StepProgress current={controller.state.currentStepIndex + 1} total={workout.steps.length} />
+        </div>
+        <div className='run-player__focus'>
+          <p className='run-player__kind'>{step.kind === 'run' ? 'Current interval' : 'Current step'}</p>
+          <h1>{step.title}</h1>
+          <p className='run-player__countdown'>{step.completion.type === 'distance' ? `${(remaining / 1000).toFixed(2)} km` : formatDuration(remaining)}</p>
+          <p className='run-player__instruction'>{step.instruction}</p>
+          {guidance && <p className='run-player__guidance'>{formatPace(guidance.minimumSecondsPerKilometre)}–{formatPace(guidance.maximumSecondsPerKilometre)} · {guidance.effort}</p>}
+        </div>
+        <dl aria-label='Live run metrics' className='run-metrics' role='group'>
           <div><dt>Distance</dt><dd>{(controller.state.totalDistanceMetres / 1000).toFixed(2)} km</dd></div>
           <div><dt>Avg pace</dt><dd>{averagePace ? formatPace(averagePace) : '—'}</dd></div>
           <div><dt>Elapsed</dt><dd>{formatDuration(controller.state.totalElapsedSeconds)}</dd></div>

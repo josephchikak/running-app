@@ -24,7 +24,7 @@
   - [x] Add tested real-data training summaries and shared presentation primitives
   - [x] Redesign the app shell, navigation, and Today cockpit
   - [x] Redesign Plan, History, and Settings
-  - [ ] Redesign active run and strength players
+  - [x] Redesign active run and strength players
   - [ ] Complete responsive visual QA, release verification, and push
 
 ## Review
