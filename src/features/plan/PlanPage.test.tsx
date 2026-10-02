@@ -25,6 +25,7 @@ describe('PlanPage', () => {
     expect(await screen.findByText('17 weeks')).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Faster 5K' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Build to 10K' })).toBeVisible()
+    expect(screen.getByRole('list', { name: /week 1 sessions/i })).toBeVisible()
     expect(screen.getByText('Monday')).toBeVisible()
   })
 

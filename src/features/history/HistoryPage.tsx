@@ -1,9 +1,12 @@
+import { useMemo } from 'react'
 import { useTraining } from '../../app/TrainingContext'
 import { workoutCatalog } from '../../data/plans/catalog'
 import { formatPace } from '../../domain/pace'
+import { summarizeResults } from '../../domain/training-summary'
 
 export function HistoryPage () {
   const { results, isLoading } = useTraining()
+  const summary = useMemo(() => summarizeResults(results), [results])
 
   return (
     <section className='page-surface history-page'>
@@ -16,12 +19,22 @@ export function HistoryPage () {
           <p>Your completed runs and strength sessions will appear here.</p>
         </div>
       )}
+      {!isLoading && results.length > 0 && (
+        <section aria-label='History summary' className='history-summary'>
+          <dl>
+            <div><dt>Sessions</dt><dd>{summary.sessions}</dd></div>
+            <div><dt>Time</dt><dd>{formatSummaryDuration(summary.durationSeconds)}</dd></div>
+            <div><dt>Distance</dt><dd>{(summary.distanceMetres / 1000).toFixed(2)} km</dd></div>
+          </dl>
+        </section>
+      )}
       <ol className='history-list'>
         {results.map(result => (
-          <li key={result.id}>
+          <li className={`history-result history-result--${result.status}`} key={result.id}>
             <div>
               <time dateTime={result.completedAt}>{formatHistoryTiming(result.plannedDate, result.completedAt)}</time>
               <h2>{workoutCatalog[result.workoutId]?.title ?? 'Workout'}</h2>
+              {result.status === 'stopped' && <span className='history-result__status'>Stopped early</span>}
             </div>
             <dl>
               <div><dt>Distance</dt><dd>{(result.distanceMetres / 1000).toFixed(2)} km</dd></div>
@@ -33,6 +46,10 @@ export function HistoryPage () {
       </ol>
     </section>
   )
+}
+
+function formatSummaryDuration (seconds: number) {
+  return `${Math.round(seconds / 60)} min`
 }
 
 function formatDuration (seconds: number) {

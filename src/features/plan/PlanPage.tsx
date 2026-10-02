@@ -67,24 +67,34 @@ interface PlanWeekRowProps {
 function PlanWeekRow ({ week, isExpanded, onToggle, onStart, onSkip, schedule }: PlanWeekRowProps) {
   const handleToggle = useCallback(() => onToggle(week.number), [onToggle, week.number])
   const weekSchedule = schedule.filter(entry => entry.weekNumber === week.number)
+  const sessionListId = `week-${week.number}-sessions`
 
   return (
     <article className={isExpanded ? 'plan-week plan-week--open' : 'plan-week'}>
-      <button onClick={handleToggle} type='button'>
-        <span>Week {week.number}</span>
+      <span aria-hidden='true' className='plan-week__marker' />
+      <button
+        aria-controls={sessionListId}
+        aria-expanded={isExpanded}
+        onClick={handleToggle}
+        type='button'
+      >
+        <span className='plan-week__number'>Week {week.number}</span>
         <strong>{week.title}</strong>
-        <span>{isExpanded ? '−' : '+'}</span>
+        <span aria-hidden='true' className='plan-week__toggle'>{isExpanded ? '−' : '+'}</span>
       </button>
       {isExpanded && (
-        <ol className='week-sessions'>
+        <ol aria-label={`Week ${week.number} sessions`} className='week-sessions' id={sessionListId}>
           {Object.entries(week.schedule).map(([day, workoutId], dayIndex) => {
             const scheduled = weekSchedule[dayIndex]
             const workout = workoutId ? workoutCatalog[workoutId] : undefined
+            const status = workout ? scheduled?.status ?? 'scheduled' : 'rest'
             return (
-              <li key={day}>
+              <li className={`week-session week-session--${status}`} key={day}>
+                <span aria-hidden='true' className='week-session__marker' />
                 <div className='week-session__summary'>
                   <span>{capitalize(day)}{scheduled ? ` · ${formatPlanDate(scheduled.date)}` : ''}</span>
                   <strong>{workout?.title ?? 'Full rest'}</strong>
+                  {workout && <small>{workout.estimatedMinutes} min</small>}
                 </div>
                 {scheduled?.status === 'scheduled' && workout && (
                   <ScheduledWorkoutActions
