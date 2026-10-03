@@ -21,7 +21,14 @@ export function TodayPage () {
   const weekSchedule = displayedEntry
     ? schedule.filter(entry => entry.weekNumber === displayedEntry.weekNumber)
     : []
-  const completedSessions = weeklySessions.filter(entry => entry.status === 'completed').length
+  const completedResultIds = new Set(
+    results.filter(result => result.status === 'completed').map(result => result.scheduledWorkoutId)
+  )
+  const completedSessions = weeklySessions.filter(entry => completedResultIds.has(entry.id)).length
+  const displayedSessionNumber = weeklySessions.findIndex(entry => entry.id === displayedEntry?.id) + 1
+  const wasStoppedEarly = displayedEntry?.status === 'completed' &&
+    results.some(result => result.scheduledWorkoutId === displayedEntry.id && result.status === 'stopped') &&
+    !completedResultIds.has(displayedEntry.id)
   const weeklySummary = useMemo(
     () => displayedEntry
       ? summarizeWeek(schedule, results, displayedEntry.weekNumber)
@@ -77,7 +84,7 @@ export function TodayPage () {
             <p className='session-summary'>{workout.description}</p>
             <dl className='session-facts'>
               <div><dt>Time</dt><dd>{workout.estimatedMinutes} min</dd></div>
-              <div><dt>Session</dt><dd>{completedSessions + (displayedEntry.status === 'scheduled' ? 1 : 0)} of {weeklySessions.length}</dd></div>
+              <div><dt>Session</dt><dd>{displayedSessionNumber} of {weeklySessions.length}</dd></div>
             </dl>
             <div
               aria-label='Weekly session progress'
@@ -92,7 +99,7 @@ export function TodayPage () {
             {displayedEntry.status === 'scheduled' && (
               <button className='primary-action' onClick={handleStartWorkout} type='button'>Start workout</button>
             )}
-            {displayedEntry.status === 'completed' && <p className='session-outcome'>Completed</p>}
+            {displayedEntry.status === 'completed' && <p className='session-outcome'>{wasStoppedEarly ? 'Stopped early' : 'Completed'}</p>}
             {displayedEntry.status === 'skipped' && <p className='session-outcome'>Skipped</p>}
           </>
         )}

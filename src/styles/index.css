@@ -916,6 +916,15 @@ input:focus-visible {
   font-weight: 750;
 }
 
+.legal-links a,
+.legal-page p a,
+.storage-notice a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+}
+
 .settings-section--danger {
   border-color: rgb(255 61 0 / 32%);
 }

@@ -74,6 +74,43 @@ describe('TodayPage', () => {
     expect(screen.getByRole('region', { name: /this week/i })).toHaveTextContent('4.20 km')
   })
 
+  it('does not count a stopped workout toward completed weekly progress', async () => {
+    const schedule = createStoredSchedule().map((entry, index) => ({
+      ...entry,
+      status: index === 0 ? 'completed' as const : entry.status
+    }))
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(schedule)
+    await repository.saveResult({
+      ...result,
+      scheduledWorkoutId: schedule[0].id,
+      status: 'stopped'
+    })
+
+    renderWithTraining(<TodayPage />, {
+      repository,
+      now: new Date('2026-09-28T08:00:00+01:00')
+    })
+
+    expect(await screen.findByRole('region', { name: /this week/i })).toHaveTextContent('0/6 planned')
+    expect(screen.getByRole('progressbar', { name: /weekly session progress/i })).toHaveAttribute('aria-valuenow', '0')
+    expect(screen.getByRole('region', { name: /this week/i })).toHaveTextContent('0 sessions')
+    expect(screen.getByText('Stopped early')).toBeVisible()
+  })
+
+  it('numbers the displayed workout by its plan position, even after a missed session', async () => {
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(createStoredSchedule())
+
+    renderWithTraining(<TodayPage />, {
+      repository,
+      now: new Date('2026-09-30T08:00:00+01:00')
+    })
+
+    expect(await screen.findByRole('heading', { name: workoutCatalog[createStoredSchedule()[2].workoutId ?? ''].title })).toBeVisible()
+    expect(screen.getByText('3 of 6')).toBeVisible()
+  })
+
   it('offers overdue workouts without replacing today’s planned session', async () => {
     const schedule = createStoredSchedule()
     await repository.saveEnrollment(enrollment)

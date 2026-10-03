@@ -20,12 +20,12 @@
   - [x] Add Catch up, selectable Plan sessions, and confirmed skipping
   - [x] Record and display planned versus actual workout dates
   - [x] Run clean verification and push the deployment branch
-- [ ] Task 11: Black-and-orange Track Cockpit UI redesign
+- [x] Task 11: Black-and-orange Track Cockpit UI redesign
   - [x] Add tested real-data training summaries and shared presentation primitives
   - [x] Redesign the app shell, navigation, and Today cockpit
   - [x] Redesign Plan, History, and Settings
   - [x] Redesign active run and strength players
-  - [ ] Complete responsive visual QA, release verification, and push
+  - [x] Complete responsive visual QA, release verification, and push
 
 ## Review
 
@@ -39,4 +39,4 @@
 - Task 8: Composed the workout engine, filtered GPS, sequential speech cues, vibration fallback, screen wake lock, checkpoint restore, and local completion into a full-screen run player. Partial finishes require confirmation and are saved as stopped sessions. Lint, 59 tests, typecheck, and production build pass.
 - Task 9: Added the installable PWA manifest and service worker, black-and-orange app/icon system, route metadata, legal pages, local storage notice, install guidance, custom error fallback, robots, sitemap, and two Playwright release flows. Lint, 62 tests, typecheck, production build, dependency audit, and a 390×844 production-preview walkthrough pass. Playwright browser launch is blocked by the managed macOS sandbox, so the real-device install, offline reload, spoken cue, wake-lock, GPS, and background-behavior checks remain for an iPhone field pass.
 - Task 10: Kept the authored calendar fixed while making every unfinished run or strength session selectable. Today now surfaces overdue sessions under Catch up, Plan provides Start and confirmed Skip controls, completed results preserve both planned and actual dates, and scheduled strength sessions save into the same local history. Lint, 70 tests, typecheck, production PWA build, and a 390×844 walkthrough pass with no console errors.
-- Task 11: Rebuilt Today, Plan, History, Settings, and both live workout players in a centered black-and-orange Track Cockpit design. Added real-data summaries, a seven-day training strip, semantic switches and progress controls, and a large orange R favicon with matching iPhone/PWA icons. Lint, typecheck, 75 tests, production PWA build, and dependency audit pass with zero vulnerabilities. Production previews at 320×812, 375×812, 390×844, and 1280×800 show no horizontal overflow; primary controls are at least 44 CSS pixels, and the browser console has no warnings or errors. iPhone installation and GPS/background behavior remain a separate field check under Task 9.
+- Task 11: Rebuilt Today, Plan, History, Settings, and both live workout players in a centered black-and-orange Track Cockpit design. Added real-data summaries, a seven-day training strip, semantic switches and progress controls, and a large orange R favicon with matching iPhone/PWA icons. Final review also aligned weekly progress with completed results, corrected session numbering, and expanded text-link tap targets. Lint, 77 tests, production PWA build, and dependency audit pass with zero vulnerabilities. Production previews at 320×812, 375×812, 390×844, and 1280×800 show no horizontal overflow; primary controls are at least 44 CSS pixels, and the browser console has no warnings or errors. iPhone installation and GPS/background behavior remain a separate field check under Task 9.
