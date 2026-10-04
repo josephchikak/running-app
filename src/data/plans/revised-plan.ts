@@ -141,7 +141,7 @@ const transitionWeek: WeekPrescription = {
   fridayMinutes: 18,
   fridayStrides: false,
   saturdayMinutes: 35,
-  quality: createEasyRun('v2-transition-w9-key', 'No-pressure recovery run', 20),
+  quality: createEasyRun('v2-transition-w9-key', 'Easy run', 20),
   isReduced: true
 }
 
@@ -160,21 +160,21 @@ function buildWeek (prescription: WeekPrescription) {
   const { number, phase, title, mondayMinutes, fridayMinutes, fridayStrides, saturdayMinutes, saturdaySteadyMinutes = 0, quality, isReduced } = prescription
   const prefix = `v2-w${number}`
   const monday = {
-    ...createEasyRun(`${prefix}-monday`, 'Aerobic reset run', mondayMinutes),
-    description: 'A relaxed aerobic reset after Saturday’s longer run. Keep it conversational and save your energy for Wednesday.'
+    ...createEasyRun(`${prefix}-monday`, 'Easy run', mondayMinutes),
+    description: 'An easy conversational run after Saturday’s longer run. Save your energy for Wednesday.'
   }
   const friday = fridayStrides
-    ? createStrideRun(`${prefix}-friday`, 'Easy run with relaxed strides', fridayMinutes)
+    ? createStrideRun(`${prefix}-friday`, 'Easy run + strides', fridayMinutes)
     : {
-        ...createEasyRun(`${prefix}-friday`, 'Pre-long-run recovery jog', fridayMinutes),
-        description: 'A short, gentle recovery jog to loosen your legs without tiring them before Saturday.'
+        ...createEasyRun(`${prefix}-friday`, 'Easy run', fridayMinutes),
+        description: 'Keep this one short and gentle so you feel ready for Saturday’s longer run.'
       }
   const saturday = number === 8
     ? createBenchmarkRun(`${prefix}-saturday`, '5K checkpoint', 5000, saturdayMinutes, 'five-k')
     : number === 17
       ? createBenchmarkRun(`${prefix}-saturday`, '10K completion run', 10000, saturdayMinutes, 'steady')
       : createLongRun(`${prefix}-saturday`,
-        saturdaySteadyMinutes > 0 ? 'Long run with a steady finish' : 'Conversational long run',
+        saturdaySteadyMinutes > 0 ? 'Long run with a steady finish' : 'Long easy run',
         saturdayMinutes, saturdaySteadyMinutes)
 
   const week: PlanWeek = {

@@ -31,6 +31,7 @@ describe('training catalog', () => {
 
   it('gives the four weekly runs distinct purposes without stacking hard days', () => {
     const fridayRunTypes = new Set<string>()
+    const wednesdayTitles = new Set<string>()
 
     for (const week of trainingCatalog.weeks) {
       const { monday, wednesday, friday, saturday, sunday } = week.schedule
@@ -39,7 +40,6 @@ describe('training catalog', () => {
       expect(workoutCatalog[wednesday].kind).toBe('run')
       expect(workoutCatalog[friday].kind).toBe('run')
       expect(workoutCatalog[saturday].kind).toBe('run')
-      expect(workoutCatalog[monday].title).not.toBe(workoutCatalog[friday].title)
       expect(workoutCatalog[monday].description).not.toBe(workoutCatalog[friday].description)
       expect(workoutCatalog[friday].steps.every(step => {
         return step.kind !== 'run' || !['five-k', 'threshold'].includes(step.intensity)
@@ -47,9 +47,23 @@ describe('training catalog', () => {
       fridayRunTypes.add(workoutCatalog[friday].steps.some(step => {
         return step.kind === 'run' && step.intensity === 'stride'
       }) ? 'strides' : 'recovery')
+      wednesdayTitles.add(workoutCatalog[wednesday].title)
     }
 
     expect(fridayRunTypes).toEqual(new Set(['strides', 'recovery']))
+    expect(wednesdayTitles.size).toBeGreaterThan(10)
+  })
+
+  it('keeps natural easy-run labels while the workouts vary', () => {
+    const firstWeek = trainingCatalog.weeks[0]
+    const secondWeek = trainingCatalog.weeks[1]
+
+    expect(workoutCatalog[firstWeek.schedule.monday].title).toBe('Easy run')
+    expect(workoutCatalog[firstWeek.schedule.friday].title).toBe('Easy run')
+    expect(workoutCatalog[secondWeek.schedule.friday].title).toBe('Easy run + strides')
+    expect(workoutCatalog[firstWeek.schedule.saturday].title).toBe('Long easy run')
+    expect(workoutCatalog[trainingCatalog.weeks[8].schedule.wednesday].title).toBe('Easy run')
+    expect(workoutCatalog[firstWeek.schedule.wednesday].title).not.toBe(workoutCatalog[secondWeek.schedule.wednesday].title)
   })
 
   it('resolves every scheduled workout to a valid template', () => {

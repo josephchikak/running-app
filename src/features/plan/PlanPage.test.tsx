@@ -27,6 +27,7 @@ describe('PlanPage', () => {
     expect(screen.getByRole('heading', { name: 'Build to 10K' })).toBeVisible()
     expect(screen.getByRole('list', { name: /week 1 sessions/i })).toBeVisible()
     expect(screen.getByText('Monday')).toBeVisible()
+    expect(screen.getAllByText('Easy run')).toHaveLength(2)
     expect(screen.getByText(/easy days build endurance and help you absorb the faster work/i)).toBeVisible()
     expect(screen.getByText('Six short efforts reintroduce leg speed without a hard opening week.')).toBeVisible()
   })
@@ -66,7 +67,7 @@ describe('PlanPage', () => {
 
     fireEvent.click(await screen.findByRole(
       'button',
-      { name: `Start ${firstWorkout.title}` },
+      { name: `Start ${firstWorkout.title} on Monday` },
       { timeout: 5000 }
     ))
 
@@ -81,8 +82,8 @@ describe('PlanPage', () => {
 
     renderWithTraining(<PlanPage />, { repository })
 
-    fireEvent.click(await screen.findByRole('button', { name: `Skip ${firstWorkout.title}` }))
-    fireEvent.click(screen.getByRole('button', { name: `Confirm skip ${firstWorkout.title}` }))
+    fireEvent.click(await screen.findByRole('button', { name: `Skip ${firstWorkout.title} on Monday` }))
+    fireEvent.click(screen.getByRole('button', { name: `Confirm skip ${firstWorkout.title} on Monday` }))
 
     await waitFor(async () => {
       const savedSchedule = await repository.listSchedule()

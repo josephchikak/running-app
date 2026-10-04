@@ -127,9 +127,23 @@ describe('TodayPage', () => {
     expect(await screen.findByRole('heading', { name: workoutCatalog[schedule[2].workoutId ?? ''].title })).toBeVisible()
     expect(screen.getByRole('heading', { name: /catch up/i })).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: /do aerobic reset run today/i }))
+    fireEvent.click(screen.getByRole('button', { name: /do easy run from mon/i }))
 
     expect(await screen.findByText('week-1-monday-2026-09-28')).toBeVisible()
+  })
+
+  it('distinguishes overdue easy runs by their planned dates', async () => {
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(createStoredSchedule())
+
+    renderWithTraining(<TodayPage />, {
+      repository,
+      now: new Date('2026-10-03T08:00:00+01:00')
+    })
+
+    const easyRunActions = await screen.findAllByRole('button', { name: /do easy run from/i })
+    expect(easyRunActions).toHaveLength(2)
+    expect(easyRunActions[0].getAttribute('aria-label')).not.toBe(easyRunActions[1].getAttribute('aria-label'))
   })
 })
 

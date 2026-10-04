@@ -140,9 +140,9 @@ export function TodayPage () {
                   <ScheduledWorkoutActions
                     onSkip={() => skipWorkout(entry.id)}
                     onStart={() => navigate(`/workout/${entry.id}`)}
-                    startAriaLabel={`Do ${overdueWorkout.title} today`}
+                    startAriaLabel={`Do ${overdueWorkout.title} from ${formatShortDate(entry.date)} today`}
                     startLabel='Do today'
-                    workoutTitle={overdueWorkout.title}
+                    workoutTitle={`${overdueWorkout.title} from ${formatShortDate(entry.date)}`}
                   />
                 </li>
               )

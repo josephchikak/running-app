@@ -31,7 +31,7 @@ export function PlanPage () {
         <div><p className='page-kicker'>Your path</p><h1>Plan</h1></div>
         <span>17 weeks</span>
       </header>
-      <p className='plan-rhythm'>Four runs each week: an aerobic reset, one focused workout, a short support run, and Saturday endurance. Easy days build endurance and help you absorb the faster work.</p>
+      <p className='plan-rhythm'>Four runs each week: two easy runs, a focused workout, and a Saturday long run. The harder sessions change across weeks; easy days build endurance and help you absorb the faster work.</p>
       {!enrollment && <p className='status-message'>Previewing the full plan. Start it from Today when you are ready.</p>}
       {phases.map(([phase, label]) => {
         const weeks = trainingCatalog.weeks.filter(week => week.phase === phase)
@@ -103,9 +103,9 @@ function PlanWeekRow ({ week, isExpanded, onToggle, onStart, onSkip, schedule }:
                   <ScheduledWorkoutActions
                     onSkip={() => onSkip(scheduled.id)}
                     onStart={() => onStart(scheduled.id)}
-                    startAriaLabel={`Start ${workout.title}`}
+                    startAriaLabel={`Start ${workout.title} on ${capitalize(day)}`}
                     startLabel='Start'
-                    workoutTitle={workout.title}
+                    workoutTitle={`${workout.title} on ${capitalize(day)}`}
                   />
                 )}
                 {scheduled?.status === 'completed' && <span className='session-status'>Completed</span>}
