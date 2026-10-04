@@ -61,7 +61,6 @@ export function TodayPage () {
         {displayedEntry && <span>Week {displayedEntry.weekNumber} of 17</span>}
       </header>
       <section aria-label="Today's workout" className='today-session'>
-        <div aria-hidden='true' className='today-session__accent' />
         {isLoading && <p className='session-state' role='status'>Opening your plan…</p>}
         {error && <p className='status-message status-message--error'>{error}</p>}
         {!isLoading && !enrollment && (
