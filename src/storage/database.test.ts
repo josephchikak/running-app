@@ -27,6 +27,22 @@ describe('training repository', () => {
     await expect(repository.listSchedule()).resolves.toEqual([scheduledWorkout])
   })
 
+  it('upgrades enrollment and schedule together without touching results or active work', async () => {
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule([scheduledWorkout])
+    await repository.saveResult(result)
+    await repository.saveActiveSession(activeSession)
+    const revisedEnrollment = { ...enrollment, planVersion: 2 }
+    const revisedSchedule = [{ ...scheduledWorkout, workoutId: 'v2-w1-monday' }]
+
+    await repository.replaceEnrollmentAndSchedule(revisedEnrollment, revisedSchedule)
+
+    await expect(repository.getEnrollment()).resolves.toEqual(revisedEnrollment)
+    await expect(repository.listSchedule()).resolves.toEqual(revisedSchedule)
+    await expect(repository.listResults()).resolves.toEqual([result])
+    await expect(repository.getActiveSession()).resolves.toEqual(activeSession)
+  })
+
   it('restores and clears the most recent active-session checkpoint', async () => {
     await repository.saveActiveSession(activeSession)
     await expect(repository.getActiveSession()).resolves.toEqual(activeSession)

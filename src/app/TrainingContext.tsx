@@ -15,6 +15,7 @@ import type {
   WorkoutResult
 } from '../domain/models'
 import { expandPlanSchedule, updateWorkoutStatus } from '../domain/schedule'
+import { upgradeScheduledWorkouts } from '../domain/plan-upgrade'
 import { importBackup } from '../storage/backup'
 import { trainingRepository, type TrainingRepository } from '../storage/database'
 
@@ -64,15 +65,29 @@ export function TrainingProvider ({
   const [error, setError] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
-    const [savedSettings, savedEnrollment, savedSchedule, savedResults] = await Promise.all([
+    const [savedSettings, savedEnrollment, savedSchedule, savedResults, activeSession] = await Promise.all([
       repository.getSettings(),
       repository.getEnrollment(),
       repository.listSchedule(),
-      repository.listResults()
+      repository.listResults(),
+      repository.getActiveSession()
     ])
+    let currentEnrollment = savedEnrollment
+    let currentSchedule = savedSchedule
+
+    if (savedEnrollment?.planId === trainingCatalog.id && savedEnrollment.planVersion === 1) {
+      currentEnrollment = { ...savedEnrollment, planVersion: trainingCatalog.version }
+      currentSchedule = upgradeScheduledWorkouts(
+        savedSchedule,
+        trainingCatalog,
+        activeSession?.scheduledWorkoutId ?? null
+      )
+      await repository.replaceEnrollmentAndSchedule(currentEnrollment, currentSchedule)
+    }
+
     setSettings(savedSettings ?? DEFAULT_SETTINGS)
-    setEnrollment(savedEnrollment)
-    setSchedule(savedSchedule)
+    setEnrollment(currentEnrollment)
+    setSchedule(currentSchedule)
     setResults(savedResults)
   }, [repository])
 
@@ -112,11 +127,8 @@ export function TrainingProvider ({
       status: entry.status
     }))
 
-    await Promise.all([
-      repository.saveSettings(settings),
-      repository.saveEnrollment(nextEnrollment),
-      repository.replaceSchedule(nextSchedule)
-    ])
+    await repository.saveSettings(settings)
+    await repository.replaceEnrollmentAndSchedule(nextEnrollment, nextSchedule)
     setEnrollment(nextEnrollment)
     setSchedule(nextSchedule)
     setError(null)

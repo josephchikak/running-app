@@ -127,7 +127,7 @@ describe('TodayPage', () => {
     expect(await screen.findByRole('heading', { name: workoutCatalog[schedule[2].workoutId ?? ''].title })).toBeVisible()
     expect(screen.getByRole('heading', { name: /catch up/i })).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: /do easy run.*week 1 today/i }))
+    fireEvent.click(screen.getByRole('button', { name: /do aerobic reset run today/i }))
 
     expect(await screen.findByText('week-1-monday-2026-09-28')).toBeVisible()
   })

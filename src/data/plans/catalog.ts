@@ -4,6 +4,7 @@ import { exerciseCatalog } from './exercises'
 import { fasterFiveKilometreWeeks, fasterFiveKilometreWorkouts } from './faster-5k'
 import { transitionWeek, transitionWorkouts } from './transition'
 import { createStrengthWorkout } from './workout-builders'
+import { revisedPlanWeeks, revisedPlanWorkouts } from './revised-plan'
 
 export { exerciseCatalog }
 
@@ -36,14 +37,15 @@ const workouts = [
   ...strengthWorkouts,
   ...fasterFiveKilometreWorkouts,
   ...transitionWorkouts,
-  ...buildToTenKilometreWorkouts
+  ...buildToTenKilometreWorkouts,
+  ...revisedPlanWorkouts
 ].map(workout => WorkoutTemplateSchema.parse(workout))
 
 export const workoutCatalog: Record<string, WorkoutTemplate> = Object.fromEntries(
   workouts.map(workout => [workout.id, workout])
 )
 
-export const trainingCatalog = PlanTemplateSchema.parse({
+export const legacyTrainingCatalog = PlanTemplateSchema.parse({
   id: 'personal-5k-to-10k',
   version: 1,
   title: '5K speed to 10K strength',
@@ -52,4 +54,11 @@ export const trainingCatalog = PlanTemplateSchema.parse({
     transitionWeek,
     ...buildToTenKilometreWeeks
   ]
+})
+
+export const trainingCatalog = PlanTemplateSchema.parse({
+  id: 'personal-5k-to-10k',
+  version: 2,
+  title: '5K speed to 10K strength',
+  weeks: revisedPlanWeeks
 })

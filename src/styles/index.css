@@ -426,6 +426,14 @@ input:focus-visible {
 
 /* Plan */
 
+.plan-rhythm {
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+  color: var(--color-muted);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
 .plan-page .status-message {
   margin-bottom: 2rem;
 }
@@ -558,6 +566,14 @@ input:focus-visible {
 
 .week-session__summary strong {
   font-size: 0.85rem;
+}
+
+.week-session__summary p {
+  max-width: 40rem;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
 }
 
 .session-status {

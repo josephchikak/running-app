@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Route, Routes, useParams } from 'react-router-dom'
-import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
+import { legacyTrainingCatalog, trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
 import { expandPlanSchedule } from '../../domain/schedule'
 import { createTrainingRepository, type TrainingRepository } from '../../storage/database'
 import { enrollment } from '../../storage/test-fixtures'
@@ -27,6 +27,27 @@ describe('PlanPage', () => {
     expect(screen.getByRole('heading', { name: 'Build to 10K' })).toBeVisible()
     expect(screen.getByRole('list', { name: /week 1 sessions/i })).toBeVisible()
     expect(screen.getByText('Monday')).toBeVisible()
+    expect(screen.getByText(/easy days build endurance and help you absorb the faster work/i)).toBeVisible()
+    expect(screen.getByText('Six short efforts reintroduce leg speed without a hard opening week.')).toBeVisible()
+  })
+
+  it('keeps the original workout title for a completed session after plan upgrade', async () => {
+    const schedule = expandPlanSchedule(legacyTrainingCatalog, enrollment.startDate).map(entry => ({
+      id: entry.id,
+      date: entry.date,
+      weekNumber: entry.weekNumber,
+      workoutId: entry.workoutId,
+      status: entry.weekNumber === 1 && entry.id.includes('monday')
+        ? 'completed' as const
+        : 'scheduled' as const
+    }))
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule(schedule)
+
+    renderWithTraining(<PlanPage />, { repository })
+
+    const completedRow = (await screen.findByText('Easy run · week 1')).closest('li')
+    expect(completedRow).toHaveTextContent('Relaxed aerobic running with a gentle warm-up and cool-down.')
   })
 
   it('starts any unfinished session from the plan', async () => {

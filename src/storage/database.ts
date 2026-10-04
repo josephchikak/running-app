@@ -57,6 +57,7 @@ export interface TrainingRepository {
   getSettings: () => Promise<UserSettings | null>
   saveEnrollment: (enrollment: PlanEnrollment) => Promise<void>
   getEnrollment: () => Promise<PlanEnrollment | null>
+  replaceEnrollmentAndSchedule: (enrollment: PlanEnrollment, schedule: ScheduledWorkout[]) => Promise<void>
   replaceSchedule: (schedule: ScheduledWorkout[]) => Promise<void>
   listSchedule: () => Promise<ScheduledWorkout[]>
   saveActiveSession: (session: ActiveSession) => Promise<void>
@@ -110,6 +111,17 @@ export function createTrainingRepository (databaseName = DATABASE_NAME): Trainin
     async getEnrollment () {
       const database = await getDatabase()
       return (await database.get('enrollment', CURRENT_KEY)) ?? null
+    },
+
+    async replaceEnrollmentAndSchedule (enrollmentValue, scheduleValues) {
+      const enrollment = PlanEnrollmentSchema.parse(enrollmentValue)
+      const schedule = scheduleValues.map(value => ScheduledWorkoutSchema.parse(value))
+      const database = await getDatabase()
+      const transaction = database.transaction(['enrollment', 'schedule'], 'readwrite')
+      await transaction.objectStore('enrollment').put(enrollment, CURRENT_KEY)
+      await transaction.objectStore('schedule').clear()
+      await Promise.all(schedule.map(entry => transaction.objectStore('schedule').put(entry)))
+      await transaction.done
     },
 
     async replaceSchedule (values) {

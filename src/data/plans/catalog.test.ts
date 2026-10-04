@@ -1,14 +1,55 @@
 import { describe, expect, it } from 'vitest'
 import { PlanTemplateSchema, WorkoutTemplateSchema } from '../../domain/models'
-import { exerciseCatalog, trainingCatalog, workoutCatalog } from './catalog'
+import { exerciseCatalog, legacyTrainingCatalog, trainingCatalog, workoutCatalog } from './catalog'
 
 describe('training catalog', () => {
   it('contains the complete phased seventeen-week sequence', () => {
+    expect(trainingCatalog.version).toBe(2)
     expect(trainingCatalog.weeks).toHaveLength(17)
     expect(trainingCatalog.weeks.slice(0, 8).every(week => week.phase === 'faster-5k')).toBe(true)
     expect(trainingCatalog.weeks[8].phase).toBe('transition')
     expect(trainingCatalog.weeks.slice(9).every(week => week.phase === 'build-to-10k')).toBe(true)
     expect(PlanTemplateSchema.safeParse(trainingCatalog).success).toBe(true)
+  })
+
+  it('opens with manageable volume and keeps the prior catalog available', () => {
+    const firstWeek = trainingCatalog.weeks[0]
+    const firstWeekRunMinutes = [
+      firstWeek.schedule.monday,
+      firstWeek.schedule.wednesday,
+      firstWeek.schedule.friday,
+      firstWeek.schedule.saturday
+    ].reduce((total, id) => total + workoutCatalog[id].estimatedMinutes, 0)
+
+    expect(firstWeekRunMinutes).toBeLessThanOrEqual(115)
+    expect(workoutCatalog[firstWeek.schedule.saturday].estimatedMinutes).toBe(35)
+    expect(firstWeek.schedule.monday).not.toBe('f5-w1-easy')
+    expect(workoutCatalog['f5-w1-easy']).toBeDefined()
+    expect(legacyTrainingCatalog.version).toBe(1)
+    expect(legacyTrainingCatalog.weeks).toHaveLength(17)
+  })
+
+  it('gives the four weekly runs distinct purposes without stacking hard days', () => {
+    const fridayRunTypes = new Set<string>()
+
+    for (const week of trainingCatalog.weeks) {
+      const { monday, wednesday, friday, saturday, sunday } = week.schedule
+      expect(sunday).toBeNull()
+      expect(workoutCatalog[monday].kind).toBe('run')
+      expect(workoutCatalog[wednesday].kind).toBe('run')
+      expect(workoutCatalog[friday].kind).toBe('run')
+      expect(workoutCatalog[saturday].kind).toBe('run')
+      expect(workoutCatalog[monday].title).not.toBe(workoutCatalog[friday].title)
+      expect(workoutCatalog[monday].description).not.toBe(workoutCatalog[friday].description)
+      expect(workoutCatalog[friday].steps.every(step => {
+        return step.kind !== 'run' || !['five-k', 'threshold'].includes(step.intensity)
+      })).toBe(true)
+      fridayRunTypes.add(workoutCatalog[friday].steps.some(step => {
+        return step.kind === 'run' && step.intensity === 'stride'
+      }) ? 'strides' : 'recovery')
+    }
+
+    expect(fridayRunTypes).toEqual(new Set(['strides', 'recovery']))
   })
 
   it('resolves every scheduled workout to a valid template', () => {
