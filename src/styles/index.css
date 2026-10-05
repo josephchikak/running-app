@@ -439,6 +439,62 @@ input:focus-visible {
   border-left: 0;
 }
 
+.plan-restart {
+  margin: 0 0 2rem;
+}
+
+.plan-restart__open {
+  padding: 0.65rem 0;
+  border: 0;
+  color: var(--color-action);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: left;
+}
+
+.plan-restart__confirmation {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 1rem;
+  background: var(--color-track);
+}
+
+.plan-restart__confirmation h2 {
+  margin: 0;
+  font: 600 1.55rem 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+}
+
+.plan-restart__confirmation p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.plan-restart__confirmation .plan-restart__hint {
+  font-size: 0.7rem;
+}
+
+.plan-restart__confirmation .plan-restart__error {
+  color: var(--color-hard);
+}
+
+.plan-restart .button-pair .plan-restart__confirm {
+  border-color: var(--color-action);
+  color: var(--color-field);
+  background: var(--color-action);
+}
+
+.plan-restart__success {
+  margin: 0.5rem 0;
+  color: var(--color-easy);
+  font-size: 0.78rem;
+}
+
 .plan-phase {
   position: relative;
   margin: 2.6rem 0;

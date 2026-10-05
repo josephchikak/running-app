@@ -3,12 +3,19 @@ import { trainingCatalog } from '../data/plans/catalog'
 import {
   expandPlanSchedule,
   getOverdueWorkouts,
+  getNextMonday,
   getTodayEntry,
   getWeeklyProgress,
   updateWorkoutStatus
 } from './schedule'
 
 describe('plan scheduling', () => {
+  it('chooses today when it is Monday or the next Monday otherwise', () => {
+    expect(getNextMonday('2026-10-05')).toBe('2026-10-05')
+    expect(getNextMonday('2026-10-06')).toBe('2026-10-12')
+    expect(() => getNextMonday('2026-02-30')).toThrow(/valid date/i)
+  })
+
   it('places the agreed sessions from Monday through Sunday', () => {
     const schedule = expandPlanSchedule(trainingCatalog, '2026-09-28')
 

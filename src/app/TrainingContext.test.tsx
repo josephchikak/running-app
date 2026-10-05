@@ -1,7 +1,9 @@
-import { screen, waitFor } from '@testing-library/react'
+import { useState } from 'react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { legacyTrainingCatalog } from '../data/plans/catalog'
+import { legacyTrainingCatalog, trainingCatalog } from '../data/plans/catalog'
 import { expandPlanSchedule } from '../domain/schedule'
+import { summarizeWeek } from '../domain/training-summary'
 import { createTrainingRepository, type TrainingRepository } from '../storage/database'
 import { activeSession, enrollment, result } from '../storage/test-fixtures'
 import { renderWithTraining } from '../test/renderWithTraining'
@@ -53,7 +55,95 @@ describe('TrainingProvider plan upgrades', () => {
   })
 })
 
+describe('TrainingProvider plan restarts', () => {
+  it('starts a fresh Week 1 even on the original Monday without counting old results', async () => {
+    const schedule = createStoredSchedule('2026-09-28')
+    await repository.saveEnrollment({ ...enrollment, planVersion: 2 })
+    await repository.replaceSchedule(schedule)
+    await repository.saveResult({ ...result, scheduledWorkoutId: schedule[0].id, workoutId: schedule[0].workoutId ?? result.workoutId })
+
+    renderWithTraining(<RestartProbe startDate='2026-09-28' />, {
+      repository,
+      now: new Date('2026-09-28T08:00:00+01:00')
+    })
+    fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
+
+    await waitFor(async () => {
+      const restarted = await repository.listSchedule()
+      expect(restarted).toHaveLength(119)
+      expect(restarted[0]).toMatchObject({ date: '2026-09-28', weekNumber: 1, status: 'scheduled' })
+      expect(restarted[0].id).not.toBe(schedule[0].id)
+      expect(summarizeWeek(restarted, await repository.listResults(), 1).sessions).toBe(0)
+    })
+    await expect(repository.listResults()).resolves.toHaveLength(1)
+  })
+
+  it('rejects a non-Monday without changing the saved plan', async () => {
+    const original = { ...enrollment, planVersion: 2 }
+    await repository.saveEnrollment(original)
+    await repository.replaceSchedule(createStoredSchedule(original.startDate))
+
+    renderWithTraining(<RestartProbe startDate='2026-10-06' />, {
+      repository,
+      now: new Date('2026-10-05T08:00:00+01:00')
+    })
+    fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/monday/i)
+    await expect(repository.getEnrollment()).resolves.toEqual(original)
+  })
+
+  it('rejects a past Monday without changing the saved plan', async () => {
+    const original = { ...enrollment, planVersion: 2 }
+    await repository.saveEnrollment(original)
+    await repository.replaceSchedule(createStoredSchedule(original.startDate))
+
+    renderWithTraining(<RestartProbe startDate='2026-09-28' />, {
+      repository,
+      now: new Date('2026-10-05T08:00:00+01:00')
+    })
+    fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/future Monday/i)
+    await expect(repository.getEnrollment()).resolves.toEqual(original)
+  })
+
+  it('leaves the plan unchanged when a workout checkpoint exists', async () => {
+    const original = { ...enrollment, planVersion: 2 }
+    await repository.saveEnrollment(original)
+    await repository.replaceSchedule(createStoredSchedule(original.startDate))
+    await repository.saveActiveSession(activeSession)
+
+    renderWithTraining(<RestartProbe startDate='2026-10-05' />, {
+      repository,
+      now: new Date('2026-10-05T08:00:00+01:00')
+    })
+    fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/in-progress workout/i)
+    await expect(repository.getEnrollment()).resolves.toEqual(original)
+  })
+})
+
 function PlanVersionProbe () {
   const { enrollment: currentEnrollment } = useTraining()
   return <p>Plan version {currentEnrollment?.planVersion ?? 'none'}</p>
+}
+
+function RestartProbe ({ startDate }: { startDate: string }) {
+  const { enrollment: currentEnrollment, restartPlan } = useTraining()
+  const [message, setMessage] = useState('')
+
+  function handleRestart () {
+    void restartPlan(startDate).catch(error => setMessage(error instanceof Error ? error.message : 'Restart failed'))
+  }
+
+  return <>{currentEnrollment && <button onClick={handleRestart} type='button'>Restart probe</button>}{message && <p role='alert'>{message}</p>}</>
+}
+
+function createStoredSchedule (startDate: string) {
+  return expandPlanSchedule(trainingCatalog, startDate).map(entry => ({
+    id: entry.id,
+    date: entry.date,
+    weekNumber: entry.weekNumber,
+    workoutId: entry.workoutId,
+    status: entry.status
+  }))
 }

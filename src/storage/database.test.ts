@@ -43,6 +43,40 @@ describe('training repository', () => {
     await expect(repository.getActiveSession()).resolves.toEqual(activeSession)
   })
 
+  it('restarts the calendar without deleting completed run history', async () => {
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule([scheduledWorkout])
+    await repository.saveResult(result)
+    const restartedEnrollment = { ...enrollment, startDate: '2026-10-05', planVersion: 2 }
+    const restartedSchedule = [{
+      ...scheduledWorkout,
+      id: 'restart-one-week-1-monday-2026-10-05',
+      date: '2026-10-05',
+      status: 'scheduled' as const
+    }]
+
+    await repository.restartEnrollmentAndSchedule(restartedEnrollment, restartedSchedule)
+
+    await expect(repository.getEnrollment()).resolves.toEqual(restartedEnrollment)
+    await expect(repository.listSchedule()).resolves.toEqual(restartedSchedule)
+    await expect(repository.listResults()).resolves.toEqual([result])
+  })
+
+  it('refuses to replace the calendar while a workout is in progress', async () => {
+    await repository.saveEnrollment(enrollment)
+    await repository.replaceSchedule([scheduledWorkout])
+    await repository.saveActiveSession(activeSession)
+
+    await expect(repository.restartEnrollmentAndSchedule(
+      { ...enrollment, startDate: '2026-10-05' },
+      [{ ...scheduledWorkout, id: 'restart-two-week-1-monday-2026-10-05', date: '2026-10-05' }]
+    )).rejects.toThrow(/in-progress workout/i)
+
+    await expect(repository.getEnrollment()).resolves.toEqual(enrollment)
+    await expect(repository.listSchedule()).resolves.toEqual([scheduledWorkout])
+    await expect(repository.getActiveSession()).resolves.toEqual(activeSession)
+  })
+
   it('restores and clears the most recent active-session checkpoint', async () => {
     await repository.saveActiveSession(activeSession)
     await expect(repository.getActiveSession()).resolves.toEqual(activeSession)

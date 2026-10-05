@@ -62,6 +62,11 @@ function addDays (date: Date, days: number) {
   return next
 }
 
+export function getNextMonday (dateValue: string) {
+  const date = parseLocalDate(dateValue)
+  return formatDate(addDays(date, (8 - date.getUTCDay()) % 7))
+}
+
 export function expandPlanSchedule (plan: PlanTemplate, startDate: string): ScheduleEntry[] {
   const firstMonday = parseLocalDate(startDate)
   if (firstMonday.getUTCDay() !== 1) throw new Error('Plan start date must be a Monday')

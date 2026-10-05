@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTraining } from '../../app/TrainingContext'
 import { ScheduledWorkoutActions } from '../../components/ScheduledWorkoutActions'
 import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
 import type { PlanWeek, ScheduledWorkout } from '../../domain/models'
+import { getNextMonday } from '../../domain/schedule'
 
 const phaseLabels = {
   'faster-5k': 'Faster 5K',
@@ -12,11 +13,16 @@ const phaseLabels = {
 } as const
 
 export function PlanPage () {
-  const { enrollment, schedule, skipWorkout } = useTraining()
+  const { enrollment, schedule, skipWorkout, restartPlan, today } = useTraining()
   const navigate = useNavigate()
   const currentEntry = schedule.find(entry => entry.status === 'scheduled')
   const initialWeek = currentEntry?.weekNumber ?? 1
   const [expandedWeek, setExpandedWeek] = useState(initialWeek)
+  const [isConfirmingRestart, setIsConfirmingRestart] = useState(false)
+  const [isRestarting, setIsRestarting] = useState(false)
+  const [restartDate, setRestartDate] = useState(() => getNextMonday(today))
+  const [restartError, setRestartError] = useState<string | null>(null)
+  const [restartMessage, setRestartMessage] = useState<string | null>(null)
   const phases = useMemo(() => Object.entries(phaseLabels), [])
   const handleWeekClick = useCallback((weekNumber: number) => {
     setExpandedWeek(current => current === weekNumber ? 0 : weekNumber)
@@ -24,6 +30,34 @@ export function PlanPage () {
   const handleStartWorkout = useCallback((scheduledWorkoutId: string) => {
     navigate(`/workout/${scheduledWorkoutId}`)
   }, [navigate])
+  const handleAskRestart = useCallback(() => {
+    setRestartDate(getNextMonday(today))
+    setRestartError(null)
+    setRestartMessage(null)
+    setIsConfirmingRestart(true)
+  }, [today])
+  const handleCancelRestart = useCallback(() => {
+    setIsConfirmingRestart(false)
+    setRestartError(null)
+  }, [])
+  const handleRestartDateChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setRestartDate(event.target.value)
+    setRestartError(null)
+  }, [])
+  const handleConfirmRestart = useCallback(async () => {
+    setIsRestarting(true)
+    setRestartError(null)
+    try {
+      await restartPlan(restartDate)
+      setExpandedWeek(1)
+      setIsConfirmingRestart(false)
+      setRestartMessage(`Plan restarted. Week 1 begins ${formatPlanDate(restartDate)}.`)
+    } catch (error) {
+      setRestartError(error instanceof Error ? error.message : 'Could not restart the plan. Try again.')
+    } finally {
+      setIsRestarting(false)
+    }
+  }, [restartDate, restartPlan])
 
   return (
     <section className='page-surface plan-page'>
@@ -33,6 +67,28 @@ export function PlanPage () {
       </header>
       <p className='plan-rhythm'>Four runs each week: two easy runs, a focused workout, and a Saturday long run. The harder sessions change across weeks; easy days build endurance and help you absorb the faster work.</p>
       {!enrollment && <p className='status-message'>Previewing the full plan. Start it from Today when you are ready.</p>}
+      {enrollment && (
+        <section aria-label='Restart plan' className='plan-restart'>
+          {!isConfirmingRestart && <button className='plan-restart__open' onClick={handleAskRestart} type='button'>Restart from Week 1</button>}
+          {isConfirmingRestart && (
+            <div className='plan-restart__confirmation'>
+              <h2>Start fresh from Week 1?</h2>
+              <p>Your current calendar and missed or completed marks will be replaced. Your saved run history stays in History.</p>
+              <label className='settings-field'>
+                New start date
+                <input min={today} onChange={handleRestartDateChange} type='date' value={restartDate} />
+              </label>
+              <p className='plan-restart__hint'>Choose today if it is Monday, or a future Monday.</p>
+              {restartError && <p className='plan-restart__error' role='alert'>{restartError}</p>}
+              <div className='button-pair'>
+                <button disabled={isRestarting} onClick={handleCancelRestart} type='button'>Cancel restart</button>
+                <button className='plan-restart__confirm' disabled={isRestarting || !restartDate} onClick={handleConfirmRestart} type='button'>{isRestarting ? 'Restarting…' : 'Confirm restart'}</button>
+              </div>
+            </div>
+          )}
+          {restartMessage && <p className='plan-restart__success' role='status'>{restartMessage}</p>}
+        </section>
+      )}
       {phases.map(([phase, label]) => {
         const weeks = trainingCatalog.weeks.filter(week => week.phase === phase)
         return (

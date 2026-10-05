@@ -58,6 +58,7 @@ export interface TrainingRepository {
   saveEnrollment: (enrollment: PlanEnrollment) => Promise<void>
   getEnrollment: () => Promise<PlanEnrollment | null>
   replaceEnrollmentAndSchedule: (enrollment: PlanEnrollment, schedule: ScheduledWorkout[]) => Promise<void>
+  restartEnrollmentAndSchedule: (enrollment: PlanEnrollment, schedule: ScheduledWorkout[]) => Promise<void>
   replaceSchedule: (schedule: ScheduledWorkout[]) => Promise<void>
   listSchedule: () => Promise<ScheduledWorkout[]>
   saveActiveSession: (session: ActiveSession) => Promise<void>
@@ -118,6 +119,23 @@ export function createTrainingRepository (databaseName = DATABASE_NAME): Trainin
       const schedule = scheduleValues.map(value => ScheduledWorkoutSchema.parse(value))
       const database = await getDatabase()
       const transaction = database.transaction(['enrollment', 'schedule'], 'readwrite')
+      await transaction.objectStore('enrollment').put(enrollment, CURRENT_KEY)
+      await transaction.objectStore('schedule').clear()
+      await Promise.all(schedule.map(entry => transaction.objectStore('schedule').put(entry)))
+      await transaction.done
+    },
+
+    async restartEnrollmentAndSchedule (enrollmentValue, scheduleValues) {
+      const enrollment = PlanEnrollmentSchema.parse(enrollmentValue)
+      const schedule = scheduleValues.map(value => ScheduledWorkoutSchema.parse(value))
+      const database = await getDatabase()
+      const transaction = database.transaction(['activeSession', 'enrollment', 'schedule'], 'readwrite')
+      const activeSession = await transaction.objectStore('activeSession').get(CURRENT_KEY)
+      if (activeSession) {
+        await transaction.done
+        throw new Error('Finish your in-progress workout before restarting the plan.')
+      }
+
       await transaction.objectStore('enrollment').put(enrollment, CURRENT_KEY)
       await transaction.objectStore('schedule').clear()
       await Promise.all(schedule.map(entry => transaction.objectStore('schedule').put(entry)))

@@ -14,7 +14,7 @@ import type {
   UserSettings,
   WorkoutResult
 } from '../domain/models'
-import { expandPlanSchedule, updateWorkoutStatus } from '../domain/schedule'
+import { expandPlanSchedule, getNextMonday, updateWorkoutStatus } from '../domain/schedule'
 import { upgradeScheduledWorkouts } from '../domain/plan-upgrade'
 import { importBackup } from '../storage/backup'
 import { trainingRepository, type TrainingRepository } from '../storage/database'
@@ -36,6 +36,7 @@ interface TrainingContextValue {
   isLoading: boolean
   error: string | null
   startPlan: () => Promise<void>
+  restartPlan: (startDate: string) => Promise<void>
   saveSettings: (settings: UserSettings) => Promise<void>
   skipWorkout: (scheduledWorkoutId: string) => Promise<void>
   restoreBackup: (json: string) => Promise<void>
@@ -134,6 +135,32 @@ export function TrainingProvider ({
     setError(null)
   }, [repository, settings, today])
 
+  const restartPlan = useCallback(async (startDate: string) => {
+    if (!enrollment) throw new Error('Start a plan before restarting it.')
+    if (startDate < today) throw new Error('Choose today or a future Monday.')
+
+    const cycleId = crypto.randomUUID().replaceAll('-', '')
+    const nextSchedule: ScheduledWorkout[] = expandPlanSchedule(trainingCatalog, startDate).map(entry => ({
+      id: `restart-${cycleId}-${entry.id}`,
+      date: entry.date,
+      weekNumber: entry.weekNumber,
+      workoutId: entry.workoutId,
+      status: entry.status
+    }))
+    const nextEnrollment: PlanEnrollment = {
+      planId: trainingCatalog.id,
+      planVersion: trainingCatalog.version,
+      startDate,
+      currentFiveKilometreSeconds: settings.currentFiveKilometreSeconds,
+      status: 'active'
+    }
+
+    await repository.restartEnrollmentAndSchedule(nextEnrollment, nextSchedule)
+    setEnrollment(nextEnrollment)
+    setSchedule(nextSchedule)
+    setError(null)
+  }, [enrollment, repository, settings.currentFiveKilometreSeconds, today])
+
   const saveSettings = useCallback(async (nextSettings: UserSettings) => {
     await repository.saveSettings(nextSettings)
     setSettings(nextSettings)
@@ -168,6 +195,7 @@ export function TrainingProvider ({
     isLoading,
     error,
     startPlan,
+    restartPlan,
     saveSettings,
     skipWorkout,
     restoreBackup,
@@ -183,6 +211,7 @@ export function TrainingProvider ({
     isLoading,
     error,
     startPlan,
+    restartPlan,
     saveSettings,
     skipWorkout,
     restoreBackup,
@@ -204,11 +233,4 @@ function formatLocalDate (date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
-}
-
-function getNextMonday (dateValue: string) {
-  const date = new Date(`${dateValue}T12:00:00Z`)
-  const daysUntilMonday = (8 - date.getUTCDay()) % 7
-  date.setUTCDate(date.getUTCDate() + daysUntilMonday)
-  return date.toISOString().slice(0, 10)
 }
