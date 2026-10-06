@@ -36,7 +36,7 @@ interface TrainingContextValue {
   isLoading: boolean
   error: string | null
   startPlan: () => Promise<void>
-  restartPlan: (startDate: string) => Promise<void>
+  restartPlan: (startDate: string) => Promise<string>
   saveSettings: (settings: UserSettings) => Promise<void>
   skipWorkout: (scheduledWorkoutId: string) => Promise<void>
   restoreBackup: (json: string) => Promise<void>
@@ -137,7 +137,7 @@ export function TrainingProvider ({
 
   const restartPlan = useCallback(async (startDate: string) => {
     if (!enrollment) throw new Error('Start a plan before restarting it.')
-    if (startDate < today) throw new Error('Choose today or a future Monday.')
+    if (startDate < today) throw new Error('Choose today or a future date.')
 
     const cycleId = crypto.randomUUID().replaceAll('-', '')
     const nextSchedule: ScheduledWorkout[] = expandPlanSchedule(trainingCatalog, startDate).map(entry => ({
@@ -159,6 +159,7 @@ export function TrainingProvider ({
     setEnrollment(nextEnrollment)
     setSchedule(nextSchedule)
     setError(null)
+    return nextSchedule[0].date
   }, [enrollment, repository, settings.currentFiveKilometreSeconds, today])
 
   const saveSettings = useCallback(async (nextSettings: UserSettings) => {

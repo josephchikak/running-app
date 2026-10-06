@@ -39,6 +39,11 @@
   - [x] Add a confirmed restart action with date selection on Plan
   - [x] Test cancellation, validation, history safety, and mobile layout
   - [x] Verify and push the deployment branch
+- [x] Task 14: Allow immediate mid-week plan restarts
+  - [x] Start Week 1 on the selected day without showing earlier days as missed
+  - [x] Keep Saturday long and Sunday rest, then resume the normal weekly rhythm
+  - [x] Correct partial-week Plan labels and restart guidance
+  - [x] Verify scheduling, UI, and production build; push the deployment branch
 
 ## Review
 
@@ -55,3 +60,4 @@
 - Task 11: Rebuilt Today, Plan, History, Settings, and both live workout players in a centered black-and-orange Track Cockpit design. Added real-data summaries, a seven-day training strip, semantic switches and progress controls, and a large orange R favicon with matching iPhone/PWA icons. Final review also aligned weekly progress with completed results, corrected session numbering, and expanded text-link tap targets. Lint, 77 tests, production PWA build, and dependency audit pass with zero vulnerabilities. Production previews at 320×812, 375×812, 390×844, and 1280×800 show no horizontal overflow; primary controls are at least 44 CSS pixels, and the browser console has no warnings or errors. iPhone installation and GPS/background behavior remain a separate field check under Task 9.
 - Task 12: Researched primary running guidance and authored a version 2 plan with distinct Monday, Wednesday, Friday, and Saturday purposes, varied key sessions, gradual long-run progression, and recovery weeks. The upgrade changes only unstarted sessions and retains version 1 templates for historical and active runs. Lint, typecheck, 84 tests, production PWA build, and dependency audit pass; mobile Plan previews at 320px and 390px have no horizontal overflow. The deployment branch is ready for push; iPhone field checks remain under Task 9.
 - Task 13: Plan now offers a confirmed Week 1 restart with a Monday date picker. The replacement calendar is written atomically, active workouts block restart, and completed-run history remains intact. New session IDs keep old results out of fresh Week 1 progress. All 95 tests, lint, typecheck, and production PWA build pass; the mobile preview shows the confirmation and success state. iPhone field checks remain under Task 9.
+- Task 14: Removed the Monday-only restart gate. Restart defaults to today; a mid-week selection creates a shorter Week 1 with an easy opening run where appropriate, no pre-start missed sessions, Saturday long, and Sunday rest. Plan rows now map by actual weekday rather than list position. The Tuesday production preview shows an immediate Start workout action; iPhone field checks remain under Task 9.

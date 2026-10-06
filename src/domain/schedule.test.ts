@@ -39,8 +39,42 @@ describe('plan scheduling', () => {
     ])
   })
 
-  it('requires the selected plan date to be a Monday', () => {
-    expect(() => expandPlanSchedule(trainingCatalog, '2026-09-29')).toThrow(/monday/i)
+  it('starts a partial opening week on Wednesday without creating overdue sessions', () => {
+    const schedule = expandPlanSchedule(trainingCatalog, '2026-10-07')
+    const firstWeek = schedule.filter(entry => entry.weekNumber === 1)
+
+    expect(firstWeek.map(entry => entry.date)).toEqual([
+      '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'
+    ])
+    expect(firstWeek[0]).toMatchObject({
+      date: '2026-10-07',
+      workoutId: trainingCatalog.weeks[0].schedule.monday,
+      kind: 'easy-run'
+    })
+    expect(firstWeek[3].kind).toBe('long-run')
+    expect(firstWeek[4].kind).toBe('rest')
+    expect(schedule.find(entry => entry.weekNumber === 2)?.date).toBe('2026-10-12')
+  })
+
+  it('uses a gentle run immediately on Tuesday or Thursday without stacking runs before Saturday', () => {
+    const tuesday = expandPlanSchedule(trainingCatalog, '2026-10-06').filter(entry => entry.weekNumber === 1)
+    const thursday = expandPlanSchedule(trainingCatalog, '2026-10-08').filter(entry => entry.weekNumber === 1)
+
+    expect(tuesday.filter(entry => entry.workoutId).map(entry => entry.date)).toEqual([
+      '2026-10-06', '2026-10-08', '2026-10-09', '2026-10-10'
+    ])
+    expect(tuesday[0].workoutId).toBe(trainingCatalog.weeks[0].schedule.monday)
+    expect(thursday.filter(entry => entry.workoutId).map(entry => entry.date)).toEqual([
+      '2026-10-08', '2026-10-10'
+    ])
+    expect(thursday[0].workoutId).toBe(trainingCatalog.weeks[0].schedule.monday)
+  })
+
+  it('keeps Sunday as rest and starts a full Week 1 on Monday', () => {
+    const schedule = expandPlanSchedule(trainingCatalog, '2026-10-11')
+
+    expect(schedule[0]).toMatchObject({ date: '2026-10-12', weekNumber: 1, kind: 'easy-run' })
+    expect(schedule).toHaveLength(119)
   })
 
   it('rejects impossible or loosely formatted dates', () => {

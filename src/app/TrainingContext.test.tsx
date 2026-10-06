@@ -78,18 +78,26 @@ describe('TrainingProvider plan restarts', () => {
     await expect(repository.listResults()).resolves.toHaveLength(1)
   })
 
-  it('rejects a non-Monday without changing the saved plan', async () => {
+  it('restarts on Wednesday with an easy run today and no old-week catch-up', async () => {
     const original = { ...enrollment, planVersion: 2 }
     await repository.saveEnrollment(original)
     await repository.replaceSchedule(createStoredSchedule(original.startDate))
 
-    renderWithTraining(<RestartProbe startDate='2026-10-06' />, {
+    renderWithTraining(<RestartProbe startDate='2026-10-07' />, {
       repository,
-      now: new Date('2026-10-05T08:00:00+01:00')
+      now: new Date('2026-10-07T08:00:00+01:00')
     })
     fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(/monday/i)
-    await expect(repository.getEnrollment()).resolves.toEqual(original)
+    await waitFor(async () => {
+      expect((await repository.getEnrollment())?.startDate).toBe('2026-10-07')
+    })
+    const schedule = await repository.listSchedule()
+    expect(schedule[0]).toMatchObject({
+      date: '2026-10-07',
+      workoutId: trainingCatalog.weeks[0].schedule.monday,
+      status: 'scheduled'
+    })
+    expect(schedule.some(entry => entry.date < '2026-10-07')).toBe(false)
   })
 
   it('rejects a past Monday without changing the saved plan', async () => {
@@ -102,7 +110,7 @@ describe('TrainingProvider plan restarts', () => {
       now: new Date('2026-10-05T08:00:00+01:00')
     })
     fireEvent.click(await screen.findByRole('button', { name: 'Restart probe' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(/future Monday/i)
+    expect(await screen.findByRole('alert')).toHaveTextContent(/future date/i)
     await expect(repository.getEnrollment()).resolves.toEqual(original)
   })
 

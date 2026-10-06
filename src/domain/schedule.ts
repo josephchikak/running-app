@@ -68,22 +68,29 @@ export function getNextMonday (dateValue: string) {
 }
 
 export function expandPlanSchedule (plan: PlanTemplate, startDate: string): ScheduleEntry[] {
-  const firstMonday = parseLocalDate(startDate)
-  if (firstMonday.getUTCDay() !== 1) throw new Error('Plan start date must be a Monday')
+  const firstDay = parseLocalDate(startDate)
+  const startWeekday = firstDay.getUTCDay()
+  const firstMonday = addDays(firstDay, startWeekday === 0 ? 1 : 1 - startWeekday)
 
   return plan.weeks.flatMap((week, weekIndex) => {
-    return DAY_KEYS.map((day, dayIndex) => {
+    return DAY_KEYS.flatMap((day, dayIndex) => {
       const date = formatDate(addDays(firstMonday, weekIndex * 7 + dayIndex))
-      const workoutId = week.schedule[day]
+      if (date < startDate) return []
+      if (weekIndex === 0 && ((startWeekday === 2 && day === 'wednesday') ||
+        (startWeekday === 4 && day === 'friday'))) return []
 
-      return {
+      const isOpeningEasyRun = weekIndex === 0 && date === startDate &&
+        startWeekday >= 2 && startWeekday <= 4
+      const workoutId = isOpeningEasyRun ? plan.weeks[0].schedule.monday : week.schedule[day]
+
+      return [{
         id: `week-${week.number}-${day}-${date}`,
         date,
         weekNumber: week.number,
         workoutId,
-        kind: DAY_KINDS[dayIndex],
+        kind: isOpeningEasyRun ? 'easy-run' as const : DAY_KINDS[dayIndex],
         status: 'scheduled' as const
-      }
+      }]
     })
   })
 }

@@ -161,7 +161,9 @@ function buildWeek (prescription: WeekPrescription) {
   const prefix = `v2-w${number}`
   const monday = {
     ...createEasyRun(`${prefix}-monday`, 'Easy run', mondayMinutes),
-    description: 'An easy conversational run after Saturday’s longer run. Save your energy for Wednesday.'
+    description: number === 1
+      ? 'Ease into the plan at a conversational effort. Finish feeling ready for your next session.'
+      : 'An easy conversational run after Saturday’s longer run. Save your energy for Wednesday.'
   }
   const friday = fridayStrides
     ? createStrideRun(`${prefix}-friday`, 'Easy run + strides', fridayMinutes)

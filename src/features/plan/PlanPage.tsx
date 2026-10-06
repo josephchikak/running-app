@@ -4,7 +4,6 @@ import { useTraining } from '../../app/TrainingContext'
 import { ScheduledWorkoutActions } from '../../components/ScheduledWorkoutActions'
 import { trainingCatalog, workoutCatalog } from '../../data/plans/catalog'
 import type { PlanWeek, ScheduledWorkout } from '../../domain/models'
-import { getNextMonday } from '../../domain/schedule'
 
 const phaseLabels = {
   'faster-5k': 'Faster 5K',
@@ -20,7 +19,7 @@ export function PlanPage () {
   const [expandedWeek, setExpandedWeek] = useState(initialWeek)
   const [isConfirmingRestart, setIsConfirmingRestart] = useState(false)
   const [isRestarting, setIsRestarting] = useState(false)
-  const [restartDate, setRestartDate] = useState(() => getNextMonday(today))
+  const [restartDate, setRestartDate] = useState(today)
   const [restartError, setRestartError] = useState<string | null>(null)
   const [restartMessage, setRestartMessage] = useState<string | null>(null)
   const phases = useMemo(() => Object.entries(phaseLabels), [])
@@ -31,7 +30,7 @@ export function PlanPage () {
     navigate(`/workout/${scheduledWorkoutId}`)
   }, [navigate])
   const handleAskRestart = useCallback(() => {
-    setRestartDate(getNextMonday(today))
+    setRestartDate(today)
     setRestartError(null)
     setRestartMessage(null)
     setIsConfirmingRestart(true)
@@ -48,10 +47,10 @@ export function PlanPage () {
     setIsRestarting(true)
     setRestartError(null)
     try {
-      await restartPlan(restartDate)
+      const firstWeekDate = await restartPlan(restartDate)
       setExpandedWeek(1)
       setIsConfirmingRestart(false)
-      setRestartMessage(`Plan restarted. Week 1 begins ${formatPlanDate(restartDate)}.`)
+      setRestartMessage(`Plan restarted. Week 1 begins ${formatPlanDate(firstWeekDate)}.`)
     } catch (error) {
       setRestartError(error instanceof Error ? error.message : 'Could not restart the plan. Try again.')
     } finally {
@@ -78,7 +77,7 @@ export function PlanPage () {
                 New start date
                 <input min={today} onChange={handleRestartDateChange} type='date' value={restartDate} />
               </label>
-              <p className='plan-restart__hint'>Choose today if it is Monday, or a future Monday.</p>
+              <p className='plan-restart__hint'>Start any day. A mid-week start has a lighter opening week; earlier days are not marked missed. Saturday stays the long run and Sunday stays rest.</p>
               {restartError && <p className='plan-restart__error' role='alert'>{restartError}</p>}
               <div className='button-pair'>
                 <button disabled={isRestarting} onClick={handleCancelRestart} type='button'>Cancel restart</button>
@@ -142,7 +141,10 @@ function PlanWeekRow ({ week, isExpanded, onToggle, onStart, onSkip, schedule }:
       {isExpanded && (
         <ol aria-label={`Week ${week.number} sessions`} className='week-sessions' id={sessionListId}>
           {Object.entries(week.schedule).map(([day, workoutId], dayIndex) => {
-            const scheduled = weekSchedule[dayIndex]
+            const scheduled = weekSchedule.find(entry => {
+              return new Date(`${entry.date}T12:00:00Z`).getUTCDay() === (dayIndex + 1) % 7
+            })
+            if (schedule.length > 0 && !scheduled) return null
             const currentWorkoutId = scheduled ? scheduled.workoutId : workoutId
             const workout = currentWorkoutId ? workoutCatalog[currentWorkoutId] : undefined
             const status = workout ? scheduled?.status ?? 'scheduled' : 'rest'
